@@ -1,7 +1,16 @@
 function [Results] = effect_size_simulation(popES, fname2save)
 %
+%   Here we will simulate many experiments were there is a case-control
+%   difference of some size (popES). We will simulate those experiments at many
+%   different sample sizes. We will also calculate effect size inflation for
+%   experiments that pass a nominal p<0.05 threshold.
+%
+%   INPUT
 %   popES = set to the desired population effect size (e.g., 0.5)
 %   fname2save = filename for pdf plot to save (leave empty if you don't want to save)
+%
+%   OUTPUT
+%   Results = structure filled with average effect size inflation estimates
 %
 
 % set seed for reproducibility
@@ -33,23 +42,24 @@ sample_sizes = [20, 50, 100, 200, 1000, 2000];
 
 
 % pre-allocate sample effect size estimate variable
-d = zeros(n_exp,length(sample_sizes));
-t = zeros(size(d));
-p = zeros(size(d));
-reject_h0 = zeros(size(d));
+d = zeros(n_exp,length(sample_sizes)); % matrix of effect sizes
+t = zeros(size(d)); % vector of t-states
+p = zeros(size(d)); % vector of p-values
+reject_h0 = zeros(size(d)); % logical vector with 1 for rejected H0, otherwise 0
 
+% Simulate n experiments
 for i = 1:n_exp
 
-    % n=20
-    samp1_data = datasample(pop1_data,sample_sizes(1));
-    samp2_data = datasample(pop2_data,sample_sizes(1));
-    d(i,1) = cohens_d(samp1_data, samp2_data, 1, 0);
-    [H,P,CI,STATS] = ttest2(samp1_data,samp2_data);
-    t(i,1) = STATS.tstat;
-    p(i,1) = P;
-    reject_h0(i,1) = H;
+    % n=20 ---------------------------------------------------------------------
+    samp1_data = datasample(pop1_data,sample_sizes(1)); % randomly sample group1
+    samp2_data = datasample(pop2_data,sample_sizes(1)); % randomly sample group2
+    d(i,1) = cohens_d(samp1_data, samp2_data, 1, 0); % compute effect size
+    [H,P,CI,STATS] = ttest2(samp1_data,samp2_data); % run hypothesis test
+    t(i,1) = STATS.tstat; % grab t-stat
+    p(i,1) = P; % grab p-value
+    reject_h0(i,1) = H; % grab indicator of whether H0 is rejected
 
-    % n=50
+    % n=50 ---------------------------------------------------------------------
     samp1_data = datasample(pop1_data,sample_sizes(2));
     samp2_data = datasample(pop2_data,sample_sizes(2));
     d(i,2) = cohens_d(samp1_data, samp2_data, 1, 0);
@@ -58,7 +68,7 @@ for i = 1:n_exp
     p(i,2) = P;
     reject_h0(i,2) = H;
 
-    % n=100
+    % n=100 --------------------------------------------------------------------
     samp1_data = datasample(pop1_data,sample_sizes(3));
     samp2_data = datasample(pop2_data,sample_sizes(3));
     d(i,3) = cohens_d(samp1_data, samp2_data, 1, 0);
@@ -67,7 +77,7 @@ for i = 1:n_exp
     p(i,3) = P;
     reject_h0(i,3) = H;
 
-    % n=200
+    % n=200 --------------------------------------------------------------------
     samp1_data = datasample(pop1_data,sample_sizes(4));
     samp2_data = datasample(pop2_data,sample_sizes(4));
     d(i,4) = cohens_d(samp1_data, samp2_data, 1, 0);
@@ -76,7 +86,7 @@ for i = 1:n_exp
     p(i,4) = P;
     reject_h0(i,4) = H;
 
-    % n=1000
+    % n=1000 -------------------------------------------------------------------
     samp1_data = datasample(pop1_data,sample_sizes(5));
     samp2_data = datasample(pop2_data,sample_sizes(5));
     d(i,5) = cohens_d(samp1_data, samp2_data, 1, 0);
@@ -85,7 +95,7 @@ for i = 1:n_exp
     p(i,5) = P;
     reject_h0(i,5) = H;
 
-    % n=2000
+    % n=2000 -------------------------------------------------------------------
     samp1_data = datasample(pop1_data,sample_sizes(6));
     samp2_data = datasample(pop2_data,sample_sizes(6));
     d(i,6) = cohens_d(samp1_data, samp2_data, 1, 0);
@@ -95,7 +105,7 @@ for i = 1:n_exp
     reject_h0(i,6) = H;
 
 end % for i
-reject_h0 = logical(reject_h0);
+reject_h0 = logical(reject_h0); % make reject_h0 a logical variable
 
 %% figure out how inflated effect sizes are for rejected H0
 for i = 1:size(d,2)
@@ -130,6 +140,7 @@ avg_es_inflate_foldincrease = ((avg_inflate-D)./D);
 % average effect size percentage increase
 avg_es_inflate_percentincrease = avg_es_inflate_foldincrease.*100;
 avg_es_inflate_percentincrease
+% save avg_es_inflate_percentincrease to Results structure as output
 Results.avg_es_inflate_percentincrease = avg_es_inflate_percentincrease;
 
 % median effect size fold increase
@@ -150,16 +161,17 @@ max_es_inflate_percentincrease
 nbins = 100;
 % xlimits to plot
 XLIM = [-1 2];
-lineWidth = 1;
-pop_es_lineColor = [0 1 0];
-rejected_h0_color = [1 0 0];
-faceAlpha = 1;
+lineWidth = 1; % how thick lines should be
+pop_es_lineColor = [0 1 0]; % what color should population effect size line be
+rejected_h0_color = [1 0 0]; % color for rejected_h0 distribution
+faceAlpha = 1; % can modify transparency of rejected_H0 distribution here
 % CI limits
 ci_lim = [2.5 97.5];
 
+% make figure, and set background to white
 figure; set(gcf,'color','white');
 
-% n=20
+% n=20 -------------------------------------------------------------------------
 idx2use = 1;
 subplot(3,2,idx2use);
 % plot histogram of sample effect sizes
@@ -179,7 +191,7 @@ ylabel('Count');
 xlim(XLIM);
 title('n=20');
 
-% n=50
+% n=50 -------------------------------------------------------------------------
 idx2use = 2;
 subplot(3,2,idx2use);
 % plot histogram of sample effect sizes
@@ -199,7 +211,7 @@ ylabel('Count');
 xlim(XLIM);
 title('n=50');
 
-% n=100
+% n=100 ------------------------------------------------------------------------
 idx2use = 3;
 subplot(3,2,idx2use);
 % plot histogram of sample effect sizes
@@ -219,7 +231,7 @@ ylabel('Count');
 xlim(XLIM);
 title('n=100');
 
-% n=200
+% n=200 ------------------------------------------------------------------------
 idx2use = 4;
 subplot(3,2,idx2use);
 % plot histogram of sample effect sizes
@@ -239,7 +251,7 @@ ylabel('Count');
 xlim(XLIM);
 title('n=200');
 
-% n=1000
+% n=1000 -----------------------------------------------------------------------
 idx2use = 5;
 subplot(3,2,idx2use);
 % plot histogram of sample effect sizes
@@ -259,7 +271,7 @@ ylabel('Count');
 xlim(XLIM);
 title('n=1000');
 
-% n=2000
+% n=2000 -----------------------------------------------------------------------
 idx2use = 6;
 subplot(3,2,idx2use);
 % plot histogram of sample effect sizes

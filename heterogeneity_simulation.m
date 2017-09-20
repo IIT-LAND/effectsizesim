@@ -1,5 +1,12 @@
 function heterogeneity_simulation(fname2save)
 %
+%   Here we will simulate ASD population with 5 subtypes. Each subtype has a 20%
+%   prevalence in the population. Both ASD and TD populations will be set to the
+%   same mean and sd, so there will be no overall case-control difference. We
+%   then simulate experiments with different sample sizes, and compute what is
+%   the sample prevalence for the 5 ASD subtypes.
+%
+%   INPUT
 %   fname2save = filename for pdf plot to save (leave empty if you don't want to save)
 %
 
@@ -36,34 +43,33 @@ nonasd_sd = std(pop_data_stacked)./2;
 % generate nonasd_data
 nonasd_data = normrnd(mean_asd, nonasd_sd, pop_n, 1);
 
-% plot population histograms
-figure; set(gcf,'color','white');
-subplot(3,1,1); hist(nonasd_data,100); grid on; xlim([-6 6]); title('Control population');
-subplot(3,1,2); hist(pop_data_stacked,100); grid on; xlim([-6 6]); title('ASD population');
-subplot(3,1,3); hist(pop_data_subgrp,500); grid on; xlim([-6 6]); title('ASD subtypes');
-legend('ASD1','ASD2','ASD3','ASD4','ASD5');
-
 
 %% Sample
 
 % how many experiments to simulate?
 n_exp = 10000;
+% pre-allocate variables for the loop
+% effect sizes
 effect_size20 = zeros(n_exp,1);
 effect_size200 = zeros(n_exp,1);
 effect_size2000 = zeros(n_exp,1);
+% sample prevalences
 subgrp_percentage20 = zeros(n_subgrp,n_exp);
 subgrp_percentage200 = zeros(n_subgrp,n_exp);
 subgrp_percentage2000 = zeros(n_subgrp,n_exp);
 
 % run simulated experiments
 parfor i = 1:n_exp
-    disp(i);
+    % disp(i);
 
-    % what is the sample size?
+    % n=20 ---------------------------------------------------------------------
     sample_size = 20;
+    % randomly sample from both populations
     [asd_sample_data, idx] = datasample(pop_data_stacked, sample_size);
     nonasd_sample_data = datasample(nonasd_data, sample_size);
+    % compute effect size
     effect_size20(i,1) = cohens_d(nonasd_sample_data, asd_sample_data,1,0);
+    % count numbers of individuals in each subtype within the sample
     subgrp_count_table = zeros(n_subgrp,3);
     subgrp_count_table(:,1) = 1:n_subgrp;
     for isub = 1:n_subgrp
@@ -71,9 +77,10 @@ parfor i = 1:n_exp
         subgrp_count_table(isub,2) = sum(tmp_lab==isub);
         subgrp_count_table(isub,3) = sum(tmp_lab==isub)./sample_size;
     end
+    % calculate sample prevalence for each subtype
     subgrp_percentage20(:,i) = subgrp_count_table(:,3);
 
-    % what is the sample size?
+    % n=200 --------------------------------------------------------------------
     sample_size = 200;
     [asd_sample_data, idx] = datasample(pop_data_stacked, sample_size);
     nonasd_sample_data = datasample(nonasd_data, sample_size);
@@ -87,7 +94,7 @@ parfor i = 1:n_exp
     end
     subgrp_percentage200(:,i) = subgrp_count_table(:,3);
 
-    % what is the sample size?
+    % n=2000 -------------------------------------------------------------------
     sample_size = 2000;
     [asd_sample_data, idx] = datasample(pop_data_stacked, sample_size);
     nonasd_sample_data = datasample(nonasd_data, sample_size);
@@ -101,78 +108,36 @@ parfor i = 1:n_exp
     end
     subgrp_percentage2000(:,i) = subgrp_count_table(:,3);
 
-end % for
+end % parfor
 
 
+
+%% plot population histograms
+XLIM1 = [-6, 6];
+XLIM2 = [0, 0.6];
 figure; set(gcf,'color','white');
-subplot(3,2,1);
-hist(effect_size20,100); grid on; xlabel('Standardized Effect Size');
-ylabel('Count');
-xlim([-2 2]);
-title('Case-Control Effect: n=20');
+% plot population distributions
+subplot(3,2,1); hist(nonasd_data,100); grid on; xlim(XLIM1); title('Control population'); xlabel('DV'); ylabel('Count');
+subplot(3,2,3); hist(pop_data_stacked,100); grid on; xlim(XLIM1); title('ASD population'); xlabel('DV'); ylabel('Count');
+subplot(3,2,5); hist(pop_data_subgrp,200); grid on; xlim(XLIM1); title('ASD subtypes'); xlabel('DV'); ylabel('Count');
 
-subplot(3,2,2);
-hist(subgrp_percentage20'); grid on; xlabel('Percentage of Sample');
-ylabel('Count');
-legend('ASD1','ASD2','ASD3','ASD4','ASD5');
-xlim([0 0.6]);
-title('Subtype Sampled: n=20');
-
-subplot(3,2,3); set(gcf,'color','white');
-hist(effect_size200,100); grid on; xlabel('Standardized Effect Size');
-ylabel('Count');
-xlim([-2 2]);
-title('Case-Control Effect: n=200');
-
-subplot(3,2,4);
-hist(subgrp_percentage200'); grid on; xlabel('Percentage of Sample');
-ylabel('Count');
-legend('ASD1','ASD2','ASD3','ASD4','ASD5');
-xlim([0 0.6]);
-title('Subtype Sampled: n=200');
-
-subplot(3,2,5); set(gcf,'color','white');
-hist(effect_size2000,100); grid on; xlabel('Standardized Effect Size');
-ylabel('Count');
-xlim([-2 2]);
-title('Case-Control Effect: n=2000');
-
-subplot(3,2,6);
-hist(subgrp_percentage2000'); grid on; xlabel('Percentage of Sample');
-ylabel('Count');
-legend('ASD1','ASD2','ASD3','ASD4','ASD5');
-xlim([0 0.6]);
-title('Subtype Sampled: n=2000');
-
-
-
-
-% plot population histograms
-figure; set(gcf,'color','white');
-subplot(3,2,1); hist(nonasd_data,100); grid on; xlim([-6 6]); title('Control population'); xlabel('DV'); ylabel('Count');
-subplot(3,2,3); hist(pop_data_stacked,100); grid on; xlim([-6 6]); title('ASD population'); xlabel('DV'); ylabel('Count');
-subplot(3,2,5); hist(pop_data_subgrp,200); grid on; xlim([-6 6]); title('ASD subtypes'); xlabel('DV'); ylabel('Count');
-%legend('ASD1','ASD2','ASD3','ASD4','ASD5');
-
+% plot sample prevalences
 subplot(3,2,2);
 hist(subgrp_percentage20'); grid on; xlabel('Sample Prevalence');
 ylabel('Count');
-% legend('ASD1','ASD2','ASD3','ASD4','ASD5');
-xlim([0 0.6]);
+xlim(XLIM2);
 title('n=20');
 
 subplot(3,2,4);
 hist(subgrp_percentage200'); grid on; xlabel('Sample Prevalence');
 ylabel('Count');
-% legend('ASD1','ASD2','ASD3','ASD4','ASD5');
-xlim([0 0.6]);
+xlim(XLIM2);
 title('n=200');
 
 subplot(3,2,6);
 hist(subgrp_percentage2000'); grid on; xlabel('Sample Prevalence');
 ylabel('Count');
-% legend('ASD1','ASD2','ASD3','ASD4','ASD5');
-xlim([0 0.6]);
+xlim(XLIM2);
 title('n=2000');
 
 
