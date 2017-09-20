@@ -292,6 +292,6 @@ xlim(XLIM);
 title('n=2000');
 
 %% save plot
-if ~isemtpy(fname2save)
+if ~isempty(fname2save)
     print(gcf,'-dpdf','-opengl','-r300',fname2save);
 end % if ~isempty
