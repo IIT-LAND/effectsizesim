@@ -1,7 +1,8 @@
-% heterogeneity_simulation.m
+function heterogeneity_simulation(fname2save)
+%
+%   fname2save = filename for pdf plot to save (leave empty if you don't want to save)
 %
 
-addpath /Users/mvlombardo/Dropbox/GitHubRepos/utils;
 
 %% Population
 % how many subgroups in the population
@@ -37,8 +38,8 @@ nonasd_data = normrnd(mean_asd, nonasd_sd, pop_n, 1);
 
 % plot population histograms
 figure; set(gcf,'color','white');
-subplot(3,1,1); hist(nonasd_data,100); grid on; xlim([-6 6]); title('Control population'); 
-subplot(3,1,2); hist(pop_data_stacked,100); grid on; xlim([-6 6]); title('ASD population'); 
+subplot(3,1,1); hist(nonasd_data,100); grid on; xlim([-6 6]); title('Control population');
+subplot(3,1,2); hist(pop_data_stacked,100); grid on; xlim([-6 6]); title('ASD population');
 subplot(3,1,3); hist(pop_data_subgrp,500); grid on; xlim([-6 6]); title('ASD subtypes');
 legend('ASD1','ASD2','ASD3','ASD4','ASD5');
 
@@ -57,7 +58,7 @@ subgrp_percentage2000 = zeros(n_subgrp,n_exp);
 % run simulated experiments
 parfor i = 1:n_exp
     disp(i);
-    
+
     % what is the sample size?
     sample_size = 20;
     [asd_sample_data, idx] = datasample(pop_data_stacked, sample_size);
@@ -66,12 +67,12 @@ parfor i = 1:n_exp
     subgrp_count_table = zeros(n_subgrp,3);
     subgrp_count_table(:,1) = 1:n_subgrp;
     for isub = 1:n_subgrp
-        tmp_lab = subgrp_labels_stacked(idx); 
-        subgrp_count_table(isub,2) = sum(tmp_lab==isub); 
-        subgrp_count_table(isub,3) = sum(tmp_lab==isub)./sample_size; 
+        tmp_lab = subgrp_labels_stacked(idx);
+        subgrp_count_table(isub,2) = sum(tmp_lab==isub);
+        subgrp_count_table(isub,3) = sum(tmp_lab==isub)./sample_size;
     end
     subgrp_percentage20(:,i) = subgrp_count_table(:,3);
-    
+
     % what is the sample size?
     sample_size = 200;
     [asd_sample_data, idx] = datasample(pop_data_stacked, sample_size);
@@ -80,9 +81,9 @@ parfor i = 1:n_exp
     subgrp_count_table = zeros(n_subgrp,3);
     subgrp_count_table(:,1) = 1:n_subgrp;
     for isub = 1:n_subgrp
-        tmp_lab = subgrp_labels_stacked(idx); 
-        subgrp_count_table(isub,2) = sum(tmp_lab==isub); 
-        subgrp_count_table(isub,3) = sum(tmp_lab==isub)./sample_size; 
+        tmp_lab = subgrp_labels_stacked(idx);
+        subgrp_count_table(isub,2) = sum(tmp_lab==isub);
+        subgrp_count_table(isub,3) = sum(tmp_lab==isub)./sample_size;
     end
     subgrp_percentage200(:,i) = subgrp_count_table(:,3);
 
@@ -94,9 +95,9 @@ parfor i = 1:n_exp
     subgrp_count_table = zeros(n_subgrp,3);
     subgrp_count_table(:,1) = 1:n_subgrp;
     for isub = 1:n_subgrp
-        tmp_lab = subgrp_labels_stacked(idx); 
-        subgrp_count_table(isub,2) = sum(tmp_lab==isub); 
-        subgrp_count_table(isub,3) = sum(tmp_lab==isub)./sample_size; 
+        tmp_lab = subgrp_labels_stacked(idx);
+        subgrp_count_table(isub,2) = sum(tmp_lab==isub);
+        subgrp_count_table(isub,3) = sum(tmp_lab==isub)./sample_size;
     end
     subgrp_percentage2000(:,i) = subgrp_count_table(:,3);
 
@@ -175,6 +176,7 @@ xlim([0 0.6]);
 title('n=2000');
 
 
-fname2save = '/Users/mvlombardo/Dropbox/Manuscripts/MolPsy_review_Heterogeneity/plots/heterogeneity_simulation_figure.pdf';
-print(gcf,'-dpdf','-opengl','-r300',fname2save);
-
+%% save plot
+if ~isemtpy(fname2save)
+    print(gcf,'-dpdf','-opengl','-r300',fname2save);
+end % if ~isempty
