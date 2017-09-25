@@ -380,7 +380,7 @@ def plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
         ss_legend.append("n = %d" % ss)
     plt.legend(ss_legend)
     plt.ylabel("Average Effect Size Inflation (Percent Increase)")
-    plt.xlabel("Effect Size")
+    plt.xlabel("Population Effect Size")
 
 
 # boilerplate code to call main code for executing
