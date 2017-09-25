@@ -227,6 +227,7 @@ def make_effectsize_subplots(nrows, ncols, effect_size, mask, popES, ci,
 
     # set tight layout to eliminate overlap of subplots
     plt.tight_layout()
+    plt.suptitle("Effect Size d = %0.02f" % popES)
 
 # function to find percentiles
 def find_percentile(effect_size, ci_interval):
@@ -381,6 +382,7 @@ def plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
     plt.legend(ss_legend)
     plt.ylabel("Average Effect Size Inflation (Percent Increase)")
     plt.xlabel("Population Effect Size")
+    plt.suptitle("Average Effect Size Inflation")
 
 
 # boilerplate code to call main code for executing
