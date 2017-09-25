@@ -360,7 +360,7 @@ def effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
             sample_sizes = sample_sizes, popES = D, ci_interval = [0.5, 99.5])
 
         es_inf_res[:, es_idx] = es_inflation_stats["mean_d_percent_increase"]
-        es_inf_res = es_inf_res.T
+    es_inf_res = es_inf_res.T
     return(es_inf_res)
 
 
