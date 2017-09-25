@@ -130,6 +130,7 @@ def plot_histogram(effect_size, nbins = 100, face_color = "gray"):
     """
     Plot histogram of all simulated experiments
     """
+    
     [n, bins, patches] = plt.hist(effect_size, nbins, facecolor = face_color)
 
 
@@ -138,11 +139,13 @@ def plot_sigexp_histogram(effect_size, mask, nbins = 100, face_color = "red"):
     """
     Plot histogram of just statistically significant experiments.
     """
+
     es2plot = effect_size[mask]
     [n, bins, patches] = plt.hist(es2plot, nbins, facecolor = face_color)
 
 # function to make an effect size plot
 def make_effectsize_plot(effect_size, mask, popES, sample_size):
+
     # plot all simulated effect sizes
     plot_histogram(effect_size, nbins = 100, face_color = "gray")
 
@@ -168,6 +171,7 @@ def make_subplot(axarr, x, y, effect_size, mask, popES, ci, sample_size,
     """
     Make a subplot.
     """
+
     # plot all simulated effect sizes
     axarr[x, y].hist(effect_size, nbins, facecolor = "gray")
 
@@ -201,6 +205,7 @@ def make_effectsize_subplots(nrows, ncols, effect_size, mask, popES, ci,
     """
     Put all subplots together.
     """
+
     # Four axes, returned as a 2-d array
     f, axarr = plt.subplots(nrows, ncols)
 
@@ -234,6 +239,7 @@ def find_percentile(effect_size, ci_interval):
     """
     Find effect size percentile scores.
     """
+
     low_ci = stats.scoreatpercentile(effect_size, ci_interval[0])
     high_ci = stats.scoreatpercentile(effect_size, ci_interval[1])
     return([low_ci, high_ci])
@@ -244,6 +250,7 @@ def compute_inflation_stats(effect_size, h0, sample_sizes, popES,
     """
     Calculate statistics for effect size inflation.
     """
+
     # make h0 boolean mask
     mask = h0.astype(bool)
 
@@ -350,17 +357,25 @@ def effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
     """
     Run simulation over a range of effect sizes and sample sizes
     """
+
+    # pre-allocate results array
     es_inf_res = np.zeros([len(sample_sizes),es_range.shape[0]])
+
+    # loop over range of effect sizes
     for es_idx, es in enumerate(es_range):
 
+        # run main simulation
         [d, t, p, h0, D, ci] = run_main_simulation(pop_mean1 = es,
             pop_sd1 = pop_sd1, pop_mean2 = pop_mean2, pop_sd2 = pop_sd2,
             sample_sizes = sample_sizes, pop_size = 10000000, n_exp = 10000)
 
+        # calcular effect size inflation stats
         es_inflation_stats = compute_inflation_stats(effect_size = d, h0 = h0,
             sample_sizes = sample_sizes, popES = D, ci_interval = [0.5, 99.5])
 
+        # grab result and put into results array
         es_inf_res[:, es_idx] = es_inflation_stats["mean_d_percent_increase"]
+
     es_inf_res = es_inf_res.T
     return(es_inf_res)
 
@@ -372,16 +387,30 @@ def plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
     Plot average effect size inflation over range of effect sizes and sample
     sizes.
     """
+
+    # make figure a specific size
     plt.figure(figsize = fig_size)
+
+    # make plot
     plt.plot(es_inf_res[1:,:])
+
+    # add grid lines
     plt.grid(linewidth = gridline_width)
+
+    # add appropriate xticks
     plt.xticks(range(0,len(es_range)-1), es_range[1:])
+
+    # make legend
     ss_legend = []
     for ss in sample_sizes:
         ss_legend.append("n = %d" % ss)
     plt.legend(ss_legend)
+
+    # add x and y-axis labels
     plt.ylabel("Average Effect Size Inflation (Percent Increase)")
     plt.xlabel("Population Effect Size")
+
+    # add plot title
     plt.suptitle("Average Effect Size Inflation")
 
 
