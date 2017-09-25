@@ -422,7 +422,7 @@ if __name__ == '__main__':
     # run simulation over a range of effect sizes
     es_range = np.arange(0,2.1,0.1)
     es_inf_res = effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
-        sample_sizes):
+        sample_sizes)
 
     # plot effect size inflation over a range of effect sizes and sample sizes
     plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
