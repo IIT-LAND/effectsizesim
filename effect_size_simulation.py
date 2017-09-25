@@ -10,9 +10,10 @@ INPUT
     first argument = the population effect size difference (e.g., 0.5)
     second argument = pdf filename for plot to save
     third argument = csv filename for saving effect size inflation stats
+    fourth argument = pdf filename for effect size inflation plot
 
 Example usage:
-python effect_size_simulation.py 0.5 ~/Desktop/test.pdf ~/Desktop/test.csv
+python effect_size_simulation.py 0.5 es_subplot.pdf test.csv es_inf_plot.pdf
 """
 
 # import libraries
@@ -342,6 +343,46 @@ def run_main_simulation(pop_mean1, pop_sd1, pop_mean2, pop_sd2, sample_sizes,
     return([d, t, p, h0, D, ci])
 
 
+# function to run simulation over range of effect sizes
+def effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
+    sample_sizes):
+    """
+    Run simulation over a range of effect sizes and sample sizes
+    """
+    es_inf_res = np.zeros([len(sample_sizes),es_range.shape[0]])
+    for es_idx, es in enumerate(es_range):
+
+        [d, t, p, h0, D, ci] = run_main_simulation(pop_mean1 = es,
+            pop_sd1 = pop_sd1, pop_mean2 = pop_mean2, pop_sd2 = pop_sd2,
+            sample_sizes = sample_sizes, pop_size = 10000000, n_exp = 10000)
+
+        es_inflation_stats = compute_inflation_stats(effect_size = d, h0 = h0,
+            sample_sizes = sample_sizes, popES = D, ci_interval = [0.5, 99.5])
+
+        es_inf_res[:, es_idx] = es_inflation_stats["mean_d_percent_increase"]
+        es_inf_res = es_inf_res.T
+    return(es_inf_res)
+
+
+# function to plot effect size inflation over range of effect sizes
+def plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
+    fig_size = (10,8)):
+    """
+    Plot average effect size inflation over range of effect sizes and sample
+    sizes.
+    """
+    plt.figure(figsize = fig_size)
+    plt.plot(es_inf_res[1:,:])
+    plt.grid(linewidth = gridline_width)
+    plt.xticks(range(0,len(es_range)-1), es_range[1:])
+    ss_legend = []
+    for ss in sample_sizes:
+        ss_legend.append("n = %d" % ss)
+    plt.legend(ss_legend)
+    plt.ylabel("Average Effect Size Inflation (Percent Increase)")
+    plt.xlabel("Effect Size")
+
+
 # boilerplate code to call main code for executing
 if __name__ == '__main__':
 
@@ -377,3 +418,16 @@ if __name__ == '__main__':
     if len(sys.argv) > 3:
         csv2save = sys.argv[3]
         es_inflation_stats.to_csv(csv2save, index = False)
+
+    # run simulation over a range of effect sizes
+    es_range = np.arange(0,2.1,0.1)
+    es_inf_res = effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
+        sample_sizes):
+
+    # plot effect size inflation over a range of effect sizes and sample sizes
+    plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
+        fig_size = (10,8))
+    # save plot as pdf
+    if len(sys.argv) > 4:
+        pdf2save = sys.argv[4]
+        plt.savefig(pdf2save)
