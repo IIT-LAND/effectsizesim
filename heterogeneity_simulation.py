@@ -138,7 +138,7 @@ def subgrp_sample_freq(sample_subgrp_labels, n_subgrp, sample_size):
     subgrps = range(1,n_subgrp+1)
 
     # pre-allocate
-    subgrp_freq = np.empty(n_subgrp)
+    subgrp_freq = np.arange(n_subgrp, dtype = float)
 
     for subgrp_idx, subgrp in enumerate(subgrps):
         mask = sample_subgrp_labels==subgrp
@@ -195,11 +195,13 @@ def run_main_simulation(pop1_data, pop2_data, n_exp, sample_size):
     experiments = np.arange(n_exp)+1
 
     # pre-allocate
-    eff_size = np.zeros([n_exp, len(sample_size)])
-    subgrp_prevalence = np.zeros([n_exp, len(sample_size)])
+    eff_size = np.zeros([n_exp, 1])
+    subgrp_prevalence = np.zeros([n_exp, 1])
 
     # loop over experiments
     for idx, i_exp in enumerate(experiments):
+
+        print("Running experiment #%d" % i_exp)
 
         # simulate experiment
         results = simulate_experiment(pop1_data, pop2_data, sample_size)
@@ -224,8 +226,8 @@ def run_simulation_over_sample_sizes(pop1_data, pop2_data, n_exp, sample_sizes):
     # build results dictionary
     res_keys = []
     for sample_size in sample_sizes:
-        res_keys.append("n%d_effectsize" & sample_size)
-        res_keys.append("n%d_subgrp_prevalence" & sample_size)
+        res_keys.append("n%d_effectsize" % sample_size)
+        res_keys.append("n%d_subgrp_prevalence" % sample_size)
     results = {key: [] for key in res_keys}
 
     for sample_size in sample_sizes:
