@@ -209,14 +209,14 @@ def run_main_simulation(pop1_data, pop2_data, n_exp, sample_size):
         subgrp_prevalence[idx,:] = results["subgrp_prevalence"]
 
     # make dictionary for output
-    results = {"effectsize":eff_size, "subgrp_prevalence":subgrp_prevalence}
+    out_res = {"effectsize":eff_size, "subgrp_prevalence":subgrp_prevalence}
 
-    return(results)
+    return(out_res)
 
 
 
 # function for running simulation over a range of sample sizes
-def run_sim_over_sample_sizes(pop1_data, pop2_data, n_exp, sample_sizes):
+def run_simulation_over_sample_sizes(pop1_data, pop2_data, n_exp, sample_sizes):
     """
     Run the main simulation over a range of sample sizes.
     """
@@ -229,8 +229,10 @@ def run_sim_over_sample_sizes(pop1_data, pop2_data, n_exp, sample_sizes):
     results = {key: [] for key in res_keys}
 
     for sample_size in sample_sizes:
+        # run main simulation
         res = run_main_simulation(pop1_data, pop2_data, n_exp, sample_size)
 
+        # grab effect size and subgrp sample prevalence
         key2use = "n%d_effectsize" % sample_size
         results[key2use] = res["effectsize"]
 
@@ -238,6 +240,8 @@ def run_sim_over_sample_sizes(pop1_data, pop2_data, n_exp, sample_sizes):
         results[key2use] = res["subgrp_prevalence"]
 
     return(results)
+
+
 
 # function for plotting histograms
 def plot_subgrp_histograms(data, fig_size = [12,12], nbins = 100,
@@ -457,3 +461,9 @@ if __name__ == '__main__':
         grand_sd = asd_data_stacked.std(), mu_subgrp = mu_subgrp, sd = sd,
         n4plot = 10000, xlimits = [-5,5], gridline_width = 0.5, fig_size = [12,12],
         nrows = 3, ncols = 1)
+
+    # run main simulation over range of sample sizes
+    n_exp = 10000
+    sample_sizes = [20, 50, 100, 200, 1000, 2000]
+    results = run_simulation_over_sample_sizes(asd_data_stacked, nonasd_data,
+        n_exp, sample_sizes)
