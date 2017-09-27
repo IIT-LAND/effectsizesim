@@ -73,6 +73,7 @@ def generate_asd_data(mu_subgrp, sd, subgrp_pop_n, n_subgrp):
     return((data, data_stacked))
 
 
+
 # function for making ASD subgrp labels
 def make_subgrp_labels(data):
     """
@@ -99,6 +100,7 @@ def make_subgrp_labels(data):
     return([subgrp_labels, n_subgrps])
 
 
+
 # function for generating population-level non-ASD data
 def generate_nonasd_data(asd_mu, asd_sd, pop_n):
     """
@@ -110,6 +112,8 @@ def generate_nonasd_data(asd_mu, asd_sd, pop_n):
     data = np.random.normal(asd_mu, sd, pop_n)
 
     return(data)
+
+
 
 # function to randomly select sample from population without replacement
 def randomly_select_sample(pop_data, sample_size):
@@ -130,6 +134,7 @@ def randomly_select_sample(pop_data, sample_size):
     sample_data  = pop_data[sample_idx]
 
     return([sample_data, sample_idx])
+
 
 
 # function to count frequency of each subgrp in a sample
@@ -175,8 +180,8 @@ def simulate_experiment(pop1_data_stacked, pop2_data, sample_size, pop1_data):
     d = cohens_d(samp1_data, samp2_data)
 
     # calculate subgrp prevalence in sample
-    [subgrp_freq, subgrp_prevalence] = subgrp_sample_freq(samp1_subgrp_labels,
-        len(n_subgrp), sample_size)
+    [subgrp_freq, subgrp_prevalence] = subgrp_sample_freq(sample_subgrp_labels = samp1_subgrp_labels,
+        n_subgrp = len(n_subgrp), sample_size = sample_size)
 
     # make dictionary with results to output
     results = {"effectsize":d, "subgrp_prevalence":subgrp_prevalence,
@@ -285,6 +290,7 @@ def plot_subgrp_histograms(data, fig_size = [12,12], nbins = 100,
 
     # show plot
     plt.show()
+
 
 
 # generate subsample of data from population for ksdensity plot
@@ -405,6 +411,7 @@ def plot_pop_ksdensity(grp, mu, sd, n4plot = 10000, xlimits = [-6,6],
 
     # show plot
     plt.show()
+
 
 
 # make all ksdensity plots
