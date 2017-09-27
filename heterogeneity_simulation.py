@@ -447,6 +447,38 @@ def make_ksdensity_subplots(grand_mu, grand_sd, mu_subgrp, sd, n4plot = 10000,
         fig_size = fig_size, subplt = True, sp_idx = [nrows,ncols,subplt_idx])
 
 
+# function to plot sample subgrp prevalences as histogram
+def make_sample_subgrp_prevalence_plot(results, sample_size, subplt = False,
+    sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6]
+    legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"]):
+    """
+    Plot sample subgrp prevalences as histogram.
+    """
+
+    # key for retrieving data from results dictionary
+    key = "n%d_subgrp_prevalence" % sample_size
+
+    if not subplt:
+        plt.hist(results[key], bins = nbins)
+    else:
+        plt.subplot(sp_idx[0],sp_idx[1],sp_idx[2]).hist(results[key],
+            bins = nbins)
+
+    # add legend
+    plt.legend(legend_labels)
+
+    # add grid lines
+    plt.grid(linewidth = gridline_width)
+
+    # set x-axis limits
+    plt.set_xlim(xlimits)
+
+    # add x and y-axis labels
+    plt.xlabel("Sample Prevalence")
+    plt.ylabel("Count")
+
+
+
 
 
 # boilerplate code to call main code for executing
@@ -482,8 +514,12 @@ if __name__ == '__main__':
     #     nrows = 3, ncols = 1)
 
     # run main simulation over range of sample sizes
-    n_exp = 10
+    n_exp = 1000
     sample_sizes = [20, 50, 100, 200, 1000, 2000]
     results = run_simulation_over_sample_sizes(pop1_data_stacked = asd_data_stacked,
         pop2_data = nonasd_data, n_exp = n_exp, sample_sizes = sample_sizes,
         pop1_data = asd_data)
+
+    make_sample_subgrp_prevalence_plot(results, sample_size = 20, subplt = False,
+        sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
+        legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"])
