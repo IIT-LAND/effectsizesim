@@ -73,6 +73,26 @@ def generate_asd_data(mu_subgrp, sd, subgrp_pop_n, n_subgrp):
     return((data, data_stacked))
 
 
+# function for making ASD subgrp labels
+def make_subgrp_labels(data):
+    """
+    Make ASD subgrp labels.
+    """
+
+    subgrp_n = data.shape[0]
+    n_subgrp = data.shape[1]
+    pop_n = n_subgrp * subgrp_n
+
+
+    labels2use = range(1,n_subgrp+1)
+    subgrp_mat = np.zeros([subgrp_n, n_subgrp])
+    for subgrp_idx, subgrp_label in enumerate(labels2use):
+        subgrp_mat[:,subgrp_idx] = np.matlib.repmat(1*(subgrp_idx+1),1,subgrp_n)
+
+    subgrp_mat = subgrp_mat.T
+    subgrp_labels = subgrp_mat.reshape((pop_n,1))
+    return(subgrp_labels)
+
 
 # function for generating population-level non-ASD data
 def generate_nonasd_data(asd_mu, asd_sd, pop_n):
@@ -86,7 +106,7 @@ def generate_nonasd_data(asd_mu, asd_sd, pop_n):
 
     return(data)
 
-
+# function to randomly select sample from population without replacement
 def randomly_select_sample(pop_data, sample_size):
     """
     Randomly sample data from population without replacement.
@@ -96,28 +116,63 @@ def randomly_select_sample(pop_data, sample_size):
     idx = range(len(pop_data))
 
     # randomly permute indices
-    rand_idx = np.random.permute(idx)
+    rand_idx = np.random.permutation(idx)
 
     # grab the first n randomly permuted indices
     sample_idx = rand_idx[range(sample_size)]
 
     # sample data
-    sample_data  = pop_data[idx2use]
+    sample_data  = pop_data[sample_idx]
 
     return([sample_data, sample_idx])
 
 
+# function to count frequency of each subgrp in a sample
+def subgrp_sample_freq(sample_subgrp_labels, n_subgrp, sample_size):
+    """
+    Count how many individuals from each subgrp are present in a sample.
+    """
+
+    subgrps = range(1,n_subgrp+1)
+
+    # pre-allocate
+    subgrp_freq = np.empty(n_subgrp)
+
+    for subgrp_idx, subgrp in enumerate(subgrps):
+        mask = sample_subgrp_labels==subgrp
+        subgrp_freq[subgrp_idx] = sum(mask)
+
+    # calculate prevalence of subgrp in the sample
+    subgrp_prevalence = subgrp_freq/sample_size
+
+    return([subgrp_freq, subgrp_prevalence])
+
+
 # function to simulate an experiment
-def simulate_experiment(pop1_data,pop2_data,sample_size):
+def simulate_experiment(pop1_data, pop2_data, sample_size):
     """
     Simulate random sampling from population.
+    pop1_data and pop2_data must be stacked.
     """
+
+    # make subgrp
+    subgrp_labels = make_subgrp_labels(pop1_data)
+    n_subgrp = np.unique(subgrp_labels)
 
     # randomly sample group1
     [samp1_data, samp1_idx] = randomly_select_sample(pop1_data, sample_size)
+    samp1_subgrp_labels = subgrp_labels[samp1_idx]
 
     # randomly sample group2
     [samp2_data, samp2_idx] = randomly_select_sample(pop2_data, sample_size)
+
+    # calculate sample effect sizes
+    d = cohens_d(samp1_data, samp2_data)
+
+    # calculate subgrp prevalence in sample
+    [subgrp_freq, subgrp_prevalence] = subgrp_sample_freq(samp1_subgrp_labels,
+        n_subgrp, sample_size)
+
 
     return((samp1_data, samp2_data))
 
