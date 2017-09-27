@@ -86,6 +86,26 @@ def generate_population(pop1_params, pop2_params, pop_size):
     return([pop1_data,pop2_data])
 
 
+def randomly_select_sample(pop_data, sample_size):
+    """
+    Randomly sample data from population without replacement.
+    """
+
+    # make indices 1:len(pop_data)
+    idx = range(len(pop_data))
+
+    # randomly permute indices
+    rand_idx = np.random.permute(idx)
+
+    # grab the first n randomly permuted indices
+    sample_idx = rand_idx[range(sample_size)]
+
+    # sample data
+    sample_data  = pop_data[idx2use]
+
+    return([sample_data, sample_idx])
+
+
 # function to evaluate results of experiment
 def evaluate_experiment(samp1_data, samp2_data, alpha_thresh = 0.05):
     """
@@ -117,10 +137,10 @@ def simulate_experiment(pop1_data,pop2_data,sample_size):
     """
 
     # randomly sample group1
-    samp1_data = np.random.choice(pop1_data, sample_size)
+    [samp1_data, samp1_idx] = randomly_select_sample(pop1_data, sample_size)
 
     # randomly sample group2
-    samp2_data = np.random.choice(pop2_data, sample_size)
+    [samp2_data, samp1_idx] = randomly_select_sample(pop2_data, sample_size)
 
     return((samp1_data, samp2_data))
 
@@ -130,7 +150,7 @@ def plot_histogram(effect_size, nbins = 100, face_color = "gray"):
     """
     Plot histogram of all simulated experiments
     """
-    
+
     [n, bins, patches] = plt.hist(effect_size, nbins, facecolor = face_color)
 
 
