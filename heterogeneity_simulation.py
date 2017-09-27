@@ -93,7 +93,10 @@ def make_subgrp_labels(data):
     # reshape subgrp matrix into a stacked array
     subgrp_mat = subgrp_mat.T
     subgrp_labels = subgrp_mat.reshape((pop_n,1))
-    return(subgrp_labels)
+
+    n_subgrps = np.unique(subgrp_labels)
+
+    return([subgrp_labels, n_subgrps])
 
 
 # function for generating population-level non-ASD data
@@ -135,7 +138,7 @@ def subgrp_sample_freq(sample_subgrp_labels, n_subgrp, sample_size):
     Count how many individuals from each subgrp are present in a sample.
     """
 
-    subgrps = range(1,n_subgrp+1)
+    subgrps = np.arange(n_subgrp)+1
 
     # pre-allocate
     subgrp_freq = np.arange(n_subgrp, dtype = float)
@@ -152,18 +155,17 @@ def subgrp_sample_freq(sample_subgrp_labels, n_subgrp, sample_size):
 
 
 # function to simulate an experiment
-def simulate_experiment(pop1_data, pop2_data, sample_size):
+def simulate_experiment(pop1_data_stacked, pop2_data, sample_size, pop1_data):
     """
     Simulate random sampling from population.
-    pop1_data and pop2_data must be stacked.
     """
 
-    # make subgrp
-    subgrp_labels = make_subgrp_labels(pop1_data)
-    n_subgrp = np.unique(subgrp_labels)
+    # make subgrp on pop1_data without stacking
+    [subgrp_labels, n_subgrp] = make_subgrp_labels(pop1_data)
 
     # randomly sample group1
-    [samp1_data, samp1_idx] = randomly_select_sample(pop1_data, sample_size)
+    [samp1_data, samp1_idx] = randomly_select_sample(pop1_data_stacked,
+        sample_size)
     samp1_subgrp_labels = subgrp_labels[samp1_idx]
 
     # randomly sample group2
@@ -174,7 +176,7 @@ def simulate_experiment(pop1_data, pop2_data, sample_size):
 
     # calculate subgrp prevalence in sample
     [subgrp_freq, subgrp_prevalence] = subgrp_sample_freq(samp1_subgrp_labels,
-        n_subgrp, sample_size)
+        len(n_subgrp), sample_size)
 
     # make dictionary with results to output
     results = {"effectsize":d, "subgrp_prevalence":subgrp_prevalence,
@@ -186,7 +188,8 @@ def simulate_experiment(pop1_data, pop2_data, sample_size):
 
 
 # function for running simulation across many experiments
-def run_main_simulation(pop1_data, pop2_data, n_exp, sample_size):
+def run_main_simulation(pop1_data_stacked, pop2_data, n_exp, sample_size,
+    pop1_data):
     """
     Run main simulation at specific sample size.
     """
@@ -194,17 +197,22 @@ def run_main_simulation(pop1_data, pop2_data, n_exp, sample_size):
     # make vector of experiments
     experiments = np.arange(n_exp)+1
 
+    # number of subgrps
+    n_subgrp = pop1_data.shape[1]
+
     # pre-allocate
     eff_size = np.zeros([n_exp, 1])
-    subgrp_prevalence = np.zeros([n_exp, 1])
+    subgrp_prevalence = np.zeros([n_exp, n_subgrp])
 
     # loop over experiments
     for idx, i_exp in enumerate(experiments):
 
-        print("Running experiment #%d" % i_exp)
+        print("Running experiment #%d at n=%d" % (i_exp, sample_size))
 
         # simulate experiment
-        results = simulate_experiment(pop1_data, pop2_data, sample_size)
+        results = simulate_experiment(pop1_data_stacked = pop1_data_stacked,
+            pop2_data = pop2_data, sample_size = sample_size,
+            pop1_data = pop1_data)
 
         # grab results of experiment
         eff_size[idx,:] = results["effectsize"]
@@ -218,7 +226,8 @@ def run_main_simulation(pop1_data, pop2_data, n_exp, sample_size):
 
 
 # function for running simulation over a range of sample sizes
-def run_simulation_over_sample_sizes(pop1_data, pop2_data, n_exp, sample_sizes):
+def run_simulation_over_sample_sizes(pop1_data_stacked, pop2_data, n_exp,
+    sample_sizes, pop1_data):
     """
     Run the main simulation over a range of sample sizes.
     """
@@ -232,7 +241,8 @@ def run_simulation_over_sample_sizes(pop1_data, pop2_data, n_exp, sample_sizes):
 
     for sample_size in sample_sizes:
         # run main simulation
-        res = run_main_simulation(pop1_data, pop2_data, n_exp, sample_size)
+        res = run_main_simulation(pop1_data_stacked, pop2_data, n_exp,
+            sample_size, pop1_data)
 
         # grab effect size and subgrp sample prevalence
         key2use = "n%d_effectsize" % sample_size
@@ -459,13 +469,14 @@ if __name__ == '__main__':
         asd_data_stacked.std(), pop_n)
 
     # make ksdensity plots
-    make_ksdensity_subplots(grand_mu = asd_data_stacked.mean(),
-        grand_sd = asd_data_stacked.std(), mu_subgrp = mu_subgrp, sd = sd,
-        n4plot = 10000, xlimits = [-5,5], gridline_width = 0.5, fig_size = [12,12],
-        nrows = 3, ncols = 1)
+    # make_ksdensity_subplots(grand_mu = asd_data_stacked.mean(),
+    #     grand_sd = asd_data_stacked.std(), mu_subgrp = mu_subgrp, sd = sd,
+    #     n4plot = 10000, xlimits = [-5,5], gridline_width = 0.5, fig_size = [12,12],
+    #     nrows = 3, ncols = 1)
 
     # run main simulation over range of sample sizes
-    n_exp = 10000
+    n_exp = 10
     sample_sizes = [20, 50, 100, 200, 1000, 2000]
-    results = run_simulation_over_sample_sizes(asd_data_stacked, nonasd_data,
-        n_exp, sample_sizes)
+    results = run_simulation_over_sample_sizes(pop1_data_stacked = asd_data_stacked,
+        pop2_data = nonasd_data, n_exp = n_exp, sample_sizes = sample_sizes,
+        pop1_data = asd_data)
