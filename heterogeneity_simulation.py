@@ -79,16 +79,18 @@ def make_subgrp_labels(data):
     Make ASD subgrp labels.
     """
 
+    # subgrp and population parameters from data
     subgrp_n = data.shape[0]
     n_subgrp = data.shape[1]
     pop_n = n_subgrp * subgrp_n
 
-
+    # make a matrix of subgrp labels
     labels2use = range(1,n_subgrp+1)
     subgrp_mat = np.zeros([subgrp_n, n_subgrp])
     for subgrp_idx, subgrp_label in enumerate(labels2use):
         subgrp_mat[:,subgrp_idx] = np.matlib.repmat(1*(subgrp_idx+1),1,subgrp_n)
 
+    # reshape subgrp matrix into a stacked array
     subgrp_mat = subgrp_mat.T
     subgrp_labels = subgrp_mat.reshape((pop_n,1))
     return(subgrp_labels)
@@ -148,6 +150,7 @@ def subgrp_sample_freq(sample_subgrp_labels, n_subgrp, sample_size):
     return([subgrp_freq, subgrp_prevalence])
 
 
+
 # function to simulate an experiment
 def simulate_experiment(pop1_data, pop2_data, sample_size):
     """
@@ -173,10 +176,68 @@ def simulate_experiment(pop1_data, pop2_data, sample_size):
     [subgrp_freq, subgrp_prevalence] = subgrp_sample_freq(samp1_subgrp_labels,
         n_subgrp, sample_size)
 
+    # make dictionary with results to output
+    results = {"effectsize":d, "subgrp_prevalence":subgrp_prevalence,
+        "samp1_data":samp1_data, "samp1_idx":samp1_idx, "samp2_data":samp1_data,
+        "samp2_idx":samp2_idx, "sample_size":sample_size}
 
-    return((samp1_data, samp2_data))
+    return(results)
 
 
+
+# function for running simulation across many experiments
+def run_main_simulation(pop1_data, pop2_data, n_exp, sample_size):
+    """
+    Run main simulation at specific sample size.
+    """
+
+    # make vector of experiments
+    experiments = np.arange(n_exp)+1
+
+    # pre-allocate
+    eff_size = np.zeros([n_exp, len(sample_size)])
+    subgrp_prevalence = np.zeros([n_exp, len(sample_size)])
+
+    # loop over experiments
+    for idx, i_exp in enumerate(experiments):
+
+        # simulate experiment
+        results = simulate_experiment(pop1_data, pop2_data, sample_size)
+
+        # grab results of experiment
+        eff_size[idx,:] = results["effectsize"]
+        subgrp_prevalence[idx,:] = results["subgrp_prevalence"]
+
+    # make dictionary for output
+    results = {"effectsize":eff_size, "subgrp_prevalence":subgrp_prevalence}
+
+    return(results)
+
+
+
+# function for running simulation over a range of sample sizes
+def run_sim_over_sample_sizes(pop1_data, pop2_data, n_exp, sample_sizes):
+    """
+    Run the main simulation over a range of sample sizes.
+    """
+
+    # build results dictionary
+    res_keys = []
+    for sample_size in sample_sizes:
+        res_keys.append("n%d_effectsize" & sample_size)
+        res_keys.append("n%d_subgrp_prevalence" & sample_size)
+    results = {key: [] for key in res_keys}
+
+    for sample_size in sample_sizes:
+        res = run_main_simulation(pop1_data, pop2_data, n_exp, sample_size)
+
+        key2use = "n%d_effectsize" % sample_size
+        results[key2use] = res["effectsize"]
+
+        key2use = "n%d_subgrp_prevalence" % sample_size
+        results[key2use] = res["subgrp_prevalence"]
+
+    return(results)
 
 # function for plotting histograms
 def plot_subgrp_histograms(data, fig_size = [12,12], nbins = 100,
