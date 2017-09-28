@@ -14,6 +14,7 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 import pandas as pd
 import random
+import pickle
 
 # set seed for reproducibility
 np.random.seed(1)
@@ -449,7 +450,7 @@ def make_ksdensity_subplots(grand_mu, grand_sd, mu_subgrp, sd, n4plot = 10000,
 
 # function to plot sample subgrp prevalences as histogram
 def make_sample_subgrp_prevalence_plot(results, sample_size, subplt = False,
-    sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6]
+    sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
     legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"]):
     """
     Plot sample subgrp prevalences as histogram.
@@ -514,12 +515,22 @@ if __name__ == '__main__':
     #     nrows = 3, ncols = 1)
 
     # run main simulation over range of sample sizes
-    n_exp = 1000
+    n_exp = 10000
     sample_sizes = [20, 50, 100, 200, 1000, 2000]
     results = run_simulation_over_sample_sizes(pop1_data_stacked = asd_data_stacked,
         pop2_data = nonasd_data, n_exp = n_exp, sample_sizes = sample_sizes,
         pop1_data = asd_data)
 
-    make_sample_subgrp_prevalence_plot(results, sample_size = 20, subplt = False,
-        sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
-        legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"])
+    # Saving the objects:
+    fname2save = "/Users/mvlombardo/Dropbox/Jupyter/objs.pickle"
+    with open(fname2save, 'w') as f:  # Python 3: open(..., 'wb')
+        pickle.dump([results], f)
+
+    # # Getting back the objects:
+    # with open(fname2save) as f:  # Python 3: open(..., 'rb')
+    #     results = pickle.load(f)
+
+
+    # make_sample_subgrp_prevalence_plot(results, sample_size = 20, subplt = False,
+    #     sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
+    #     legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"])
