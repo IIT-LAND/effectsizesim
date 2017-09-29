@@ -11,7 +11,6 @@ python heterogeneity_simulation.py --n_exp 10000 --n_subgrp 5 --mu_subgrp '-1,-0
 """
 
 # import libraries
-import sys
 import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
