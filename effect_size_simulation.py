@@ -6,14 +6,9 @@ estimates of sample effect size as well as effect size inflation. Can produce a
 plot of effect sizes as pdf and can produce a csv file with statistics about the
 degree of effect size inflation.
 
-INPUT
-    first argument = the population effect size difference (e.g., 0.5)
-    second argument = pdf filename for plot to save
-    third argument = csv filename for saving effect size inflation stats
-    fourth argument = pdf filename for effect size inflation plot
-
 Example usage:
-python effect_size_simulation.py 0.5 es_subplot.pdf test.csv es_inf_plot.pdf
+python effect_size_simulation.py --es 0.5 --espdf2save es_subplot.pdf
+    --csv2save test.csv --esinfpdf2save es_inf_plot.pdf
 """
 
 # import libraries
@@ -22,9 +17,25 @@ import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
 import pandas as pd
+from optparse import OptionParser
+
 
 # set seed for reproducibility
 np.random.seed(1)
+
+
+# function to parse input arguments
+def parse_args():
+    """
+    Parse arguments.
+    """
+    parser=OptionParser()
+    parser.add_option('--es',"",dest='es',help="Population effect size to use ex: --es 0.5",default=0.5)
+    parser.add_option('--espdf2save',"",dest='es_pdf2save',help="PDF filename for effect size figure ex: --espdf2save plot.pdf",default=None)
+    parser.add_option('--csv2save',"",dest='csv2save',help="csv file to save results of simulation over range of effect sizes ex: --csv2save res.csv",default=None)
+    parser.add_option('--esinfpdf2save',"",dest='esinfpdf2save',help="PDF filename for effect size inflation figure ex: --esinfpdf2save es_inf.pdf",default=None)
+    (options,args) = parser.parse_args()
+    return(options)
 
 
 # function to compute Cohen's d
@@ -436,18 +447,6 @@ def plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
 
 
 
-# function to parse input arguments
-def parse_args():
-    """
-    Parse arguments.
-    """
-    parser=OptionParser()
-    parser.add_option('--es',"",dest='es',help="Population effect size to use ex: --es 0.5",default=0.5)
-    parser.add_option('--espdf2save',"",dest='es_pdf2save',help="PDF filename for effect size figure ex: --espdf2save plot.pdf",default=None)
-    parser.add_option('--csv2save',"",dest='csv2save',help="csv file to save results of simulation over range of effect sizes ex: --csv2save res.csv",default=None)
-    parser.add_option('--esinfpdf2save',"",dest='esinfpdf2save',help="PDF filename for effect size inflation figure ex: --esinfpdf2save es_inf.pdf",default=None)
-    (options,args) = parser.parse_args()
-    return(options)
 
 
 
