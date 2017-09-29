@@ -384,7 +384,7 @@ def plot_subgrp_ksdensity(mu_subgrp, sd, n4plot = 10000,
     plt.ylabel("Count")
 
     # show plot
-    plt.show()
+    # plt.show()
 
 
 
@@ -432,7 +432,7 @@ def plot_pop_ksdensity(grp, mu, sd, n4plot = 10000, xlimits = [-6,6],
     plt.ylabel("Count")
 
     # show plot
-    plt.show()
+    # plt.show()
 
 
 
@@ -538,7 +538,7 @@ if __name__ == '__main__':
     # make ksdensity plots
     make_ksdensity_subplots(grand_mu = asd_data_stacked.mean(),
         grand_sd = asd_data_stacked.std(), mu_subgrp = mu_subgrp, sd = sd,
-        n4plot = 10000, xlimits = [-5,5], gridline_width = 0.5, fig_size = [12,12],
+        n4plot = 1000, xlimits = [-5,5], gridline_width = 0.5, fig_size = [12,12],
         nrows = 3, ncols = 1)
     # save figure
     if opts.ksd2save  is not None:
