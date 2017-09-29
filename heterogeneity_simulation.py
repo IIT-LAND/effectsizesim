@@ -7,7 +7,7 @@ then simulate experiments with different sample sizes, and compute what is
 the sample prevalence for the 5 ASD subtypes.
 
 Example usage:
-python heterogeneity_simulation.py --n_exp 10000 --n_subgrp 5 --mu_subgrp '-1,-0.5,0,0.5,1' --pop_sd 1 --subgrp_pop_n 200000 --kds2save kdsplot.pdf --pdf2save sample_prevalence_plot.pdf
+python heterogeneity_simulation.py --n_exp 10000 --n_subgrp 5 --mu_subgrp '-1,-0.5,0,0.5,1' --sample_sizes '20,50,100,200,1000,2000'--pop_sd 1 --subgrp_pop_n 200000 --kds2save kdsplot.pdf --pdf2save sample_prevalence_plot.pdf
 """
 
 # import libraries
@@ -33,6 +33,7 @@ def parse_args():
     parser.add_option('--n_exp',"",dest='n_exp',help="Number of experiments to simulation ex: --n_exp 10000",default=10000)
     parser.add_option('--n_subgrp',"",dest='n_subgrp',help="Number of ASD subgroups to simulation ex: --n_subgrp 5",default=5)
     parser.add_option('--mu_subgrp',"",dest='mu_subgrp',help="Effect size for each subgroup ex: --mu_subgrp '-1,-0.5,0,0.5,1'",default='-1,-0.5,0,0.5,1')
+    parser.add_option('--sample_sizes',"",dest='sample_sizes',help="Sample sizes to simulate ex: --sample_sizes '20,50,100,200,1000,2000'",default='20,50,100,200,1000,2000')
     parser.add_option('--pop_sd',"",dest='pop_sd',help="Population standard deviation ex: --pop_sd 1",default=1)
     parser.add_option('--subgrp_pop_n',"",dest='subgrp_pop_n',help="Size of each subgroup in the population ex: --subgrp_pop_n 200000",default=200000)
     parser.add_option('--ksd2save',"",dest='ksd2save',help="PDF filename of ksdensity plot figure to save ex: --ksd2save ksd_plot.pdf",default=None)
@@ -591,6 +592,10 @@ if __name__ == '__main__':
     mu_subgrp = opts.mu_subgrp
     mu_subgrp = np.array(mu_subgrp.split(','),dtype = float)
 
+    # sample_sizes
+    sample_sizes = opts.sample_sizes
+    sample_sizes = np.array(sample_sizes.split(','), dtype = int)
+
     # population SD
     sd = np.array(opts.pop_sd, dtype = int)
 
@@ -609,15 +614,15 @@ if __name__ == '__main__':
     # make ksdensity plots
     make_ksdensity_subplots(grand_mu = asd_data_stacked.mean(),
         grand_sd = asd_data_stacked.std(), mu_subgrp = mu_subgrp, sd = sd,
-        n4plot = 10000, xlimits = [-5,5], gridline_width = 0.5, fig_size = [12,12],
-        nrows = 3, ncols = 1)
+        n4plot = 10000, xlimits = [-5,5], gridline_width = 0.5,
+        fig_size = [12,12], nrows = 3, ncols = 1)
     # save figure
     if opts.ksd2save  is not None:
         plt.savefig(opts.ksd2save)
 
     # run main simulation over range of sample sizes
     # n_exp = 10000
-    sample_sizes = [20, 50, 100, 200, 1000, 2000]
+    # sample_sizes = [20, 50, 100, 200, 1000, 2000]
     results = run_simulation_over_sample_sizes(pop1_data_stacked = asd_data_stacked,
         pop2_data = nonasd_data, n_exp = n_exp, sample_sizes = sample_sizes,
         pop1_data = asd_data)
