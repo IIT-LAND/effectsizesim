@@ -193,7 +193,7 @@ def make_effectsize_plot(effect_size, mask, popES, sample_size):
 
 # function for making specific subplots
 def make_subplot(axarr, x, y, effect_size, mask, popES, ci, sample_size,
-    nbins = 100, gridline_width = 0.5, xlimits = [-1, 2]):
+    nbins = 100, gridline_width = 0.5, xlimits = [-1, 2], font_name = "Arial"):
     """
     Make a subplot.
     """
@@ -212,12 +212,12 @@ def make_subplot(axarr, x, y, effect_size, mask, popES, ci, sample_size,
     axarr[x, y].axvline(x = ci[1], color = "black")
 
     # insert x and y-axis labels
-    axarr[x, y].set_xlabel('Effect Size')
-    axarr[x, y].set_ylabel("Count")
+    axarr[x, y].set_xlabel('Effect Size', fontname=font_name)
+    axarr[x, y].set_ylabel("Count", fontname=font_name)
 
     # insert subplot title
     title_str = "n = %s" % (str(sample_size))
-    axarr[x, y].set_title(title_str)
+    axarr[x, y].set_title(title_str, fontname=font_name, fontweight='bold')
 
     # insert grid
     axarr[x, y].grid(linewidth = gridline_width)
@@ -227,7 +227,8 @@ def make_subplot(axarr, x, y, effect_size, mask, popES, ci, sample_size,
 
 # function to put together multiple subplots
 def make_effectsize_subplots(nrows, ncols, effect_size, mask, popES, ci,
-    sample_sizes, nbins = 100, gridline_width = 0.5, xlimits = [-1, 2]):
+    sample_sizes, nbins = 100, gridline_width = 0.5, xlimits = [-1, 2],
+    font_name = "Arial"):
     """
     Put all subplots together.
     """
@@ -258,7 +259,8 @@ def make_effectsize_subplots(nrows, ncols, effect_size, mask, popES, ci,
 
     # set tight layout to eliminate overlap of subplots
     plt.tight_layout()
-    plt.suptitle("Effect Size d = %0.02f" % popES)
+    plt.suptitle("Effect Size d = %0.02f" % popES, fontname=font_name,
+        fontweight='bold')
 
 # function to find percentiles
 def find_percentile(effect_size, ci_interval):
@@ -410,7 +412,7 @@ def effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
 
 # function to plot effect size inflation over range of effect sizes
 def plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
-    fig_size = (10,8)):
+    fig_size = (10,8), font_name = "Arial"):
     """
     Plot average effect size inflation over range of effect sizes and sample
     sizes.
@@ -432,14 +434,16 @@ def plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
     ss_legend = []
     for ss in sample_sizes:
         ss_legend.append("n = %d" % ss)
-    plt.legend(ss_legend)
+    plt.legend(ss_legend, fontname = font_name)
 
     # add x and y-axis labels
-    plt.ylabel("Average Effect Size Inflation (Percent Increase)")
-    plt.xlabel("Population Effect Size")
+    plt.ylabel("Average Effect Size Inflation (Percent Increase)",
+        fontname = font_name)
+    plt.xlabel("Population Effect Size", fontname = font_name)
 
     # add plot title
-    plt.suptitle("Average Effect Size Inflation")
+    plt.title("Average Effect Size Inflation", fontname = font_name,
+        fontweight='bold')
 
 
 
