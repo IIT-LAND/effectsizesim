@@ -102,23 +102,10 @@ def randomly_select_sample(pop_data, sample_size):
     """
     Randomly sample data from population without replacement.
     """
-    # # make indices 1:len(pop_data)
-    # idx = range(len(pop_data))
-    #
-    # # randomly permute indices
-    # rand_idx = np.random.permutation(idx)
-    #
-    # # grab the first n randomly permuted indices
-    # sample_idx = rand_idx[range(sample_size)]
-    #
-    # # sample data
-    # sample_data  = pop_data[sample_idx]
 
     sample_data = np.array(random.sample(pop_data, sample_size))
     # sample_data = np.random.choice(pop_data, sample_size, replace = False)
 
-    # print(type(sample_data))
-    # return([sample_data, sample_idx])
     return(sample_data)
 
 
