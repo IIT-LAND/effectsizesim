@@ -105,7 +105,7 @@ def randomly_select_sample(pop_data, sample_size):
     idx = range(len(pop_data))
 
     # randomly permute indices
-    rand_idx = np.random.permute(idx)
+    rand_idx = np.random.permutation(idx)
 
     # grab the first n randomly permuted indices
     sample_idx = rand_idx[range(sample_size)]
