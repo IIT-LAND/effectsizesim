@@ -509,13 +509,13 @@ if __name__ == '__main__':
     opts = parse_args()
 
     # n experiments to simulate
-    n_exp = opts.n_exp
+    n_exp = np.array(opts.n_exp, dtype = int)
 
     # n subgrps
-    n_subgrp = opts.n_subgrp
+    n_subgrp = np.array(opts.n_subgrp, dtype = int)
 
     # sample size of each subgroup
-    subgrp_pop_n = opts.subgrp_pop_n
+    subgrp_pop_n = np.array(opts.subgrp_pop_n, dtype = int)
 
     # total population n
     pop_n = n_subgrp*subgrp_pop_n
