@@ -344,13 +344,10 @@ def generate_data_for_ksdensity_plot(grp_type, mu, sd, n4plot = 10000):
 # function for making kernel density plot
 def plot_subgrp_ksdensity(mu_subgrp, sd, n4plot = 10000,
     xlimits = [-6,6], gridline_width = 0.5, fig_size = [12,12],
-    grp_type = "ASDsubgrps", subplt = False, sp_idx = None):
+    grp_type = "ASDsubgrps", axarr=None, sp_idx = None):
     """
     Make kernel density plots for each ASD subgrp.
     """
-
-    # # make figure specific size
-    plt.figure(figsize = fig_size)
 
     # generate data for plot
     [data4plot, data_stacked] = generate_data_for_ksdensity_plot(grp_type = grp_type,
@@ -365,38 +362,43 @@ def plot_subgrp_ksdensity(mu_subgrp, sd, n4plot = 10000,
         xs = np.linspace(xlimits[0], xlimits[1], density.n)
         # create legend label
         label2use = "ASD%d" % (mu_idx+1)
-        if not subplt:
+        if axarr is None:
+            plt.figure(figsize = fig_size)
+
             # make plot
             plt.plot(xs, density(xs), label = label2use)
+
+            # add grid lines
+            plt.grid(linewidth = gridline_width)
+
+            # add legend
+            plt.legend()
+
+            # add x and y-axis labels
+            plt.xlabel("DV")
+            plt.ylabel("Count")
+
         else:
-            plt.subplot(sp_idx[0],sp_idx[1],sp_idx[2]).plot(xs, density(xs),
-            label = label2use)
-        # plt.plot(xs, density(xs), label = label2use)
+            axarr[sp_idx].plot(xs, density(xs), label = label2use)
 
-    # add grid lines
-    plt.grid(linewidth = gridline_width)
+            # add grid lines
+            axarr[sp_idx].grid(linewidth = gridline_width)
 
-    # add legend
-    plt.legend()
+            # add legend
+            axarr[sp_idx].legend()
 
-    # add x and y-axis labels
-    plt.xlabel("DV")
-    plt.ylabel("Count")
-
-    # show plot
-    plt.show()
+            # add x and y-axis labels
+            axarr[sp_idx].set_xlabel("DV")
+            axarr[sp_idx].set_ylabel("Count")
 
 
 
 # function for making kernel density plot
 def plot_pop_ksdensity(grp, mu, sd, n4plot = 10000, xlimits = [-6,6],
-    gridline_width = 0.5, fig_size = [12,12], subplt = False, sp_idx = None):
+    gridline_width = 0.5, fig_size = [12,12], axarr = None, sp_idx = None):
     """
     Make kernel density plots for each population.
     """
-
-    # # make figure specific size
-    plt.figure(figsize = fig_size)
 
     # generate data for plot
     [data4plot, data_stacked] = generate_data_for_ksdensity_plot(grp_type = grp,
@@ -413,26 +415,34 @@ def plot_pop_ksdensity(grp, mu, sd, n4plot = 10000, xlimits = [-6,6],
     # make xs for plotting
     xs = np.linspace(xlimits[0], xlimits[1], density.n)
 
-    if not subplt:
+    if axarr is None:
+        plt.figure(figsize = fig_size)
+
         # make plot
         plt.plot(xs,density(xs), label = grp)
+
+        # add grid lines
+        plt.grid(linewidth = gridline_width)
+
+        # add legend
+        plt.legend()
+
+        # add x and y-axis labels
+        plt.xlabel("DV")
+        plt.ylabel("Count")
+
     else:
-        plt.subplot(sp_idx[0],sp_idx[1],sp_idx[2]).plot(xs,density(xs),
-        label = grp)
-    # plt.plot(xs,density(xs), label = grp)
+        axarr[sp_idx].plot(xs,density(xs), label = grp)
 
-    # add grid lines
-    plt.grid(linewidth = gridline_width)
+        # add grid lines
+        axarr[sp_idx].grid(linewidth = gridline_width)
 
-    # add legend
-    plt.legend()
+        # add legend
+        axarr[sp_idx].legend()
 
-    # add x and y-axis labels
-    plt.xlabel("DV")
-    plt.ylabel("Count")
-
-    # show plot
-    plt.show()
+        # add x and y-axis labels
+        axarr[sp_idx].set_xlabel("DV")
+        axarr[sp_idx].set_ylabel("Count")
 
 
 
@@ -444,39 +454,48 @@ def make_ksdensity_subplots(grand_mu, grand_sd, mu_subgrp, sd, n4plot = 10000,
     Put together all ksdensity subplots into one figure.
     """
 
+    # Four axes, returned as a 2-d array
+    f, axarr = plt.subplots(nrows, ncols)
+    f.set_size_inches(fig_size[0],fig_size[1])
+
     # non-ASD subplot
-    subplt_idx = 1
+    subplt_idx = 0
     mu2use = grand_mu
     sd2use = grand_sd/2
     plot_pop_ksdensity(grp = "non-ASD", mu = mu2use,
         sd = sd2use, n4plot = n4plot, xlimits = xlimits,
         gridline_width = gridline_width, fig_size = fig_size,
-        subplt = True, sp_idx = [nrows,ncols,subplt_idx])
+        axarr = axarr, sp_idx = subplt_idx)
 
     # ASD subplot
-    subplt_idx = 2
+    subplt_idx = 1
     mu2use = grand_mu
     sd2use = grand_sd
     plot_pop_ksdensity(grp = "ASD", mu = mu2use,
         sd = sd2use, n4plot = n4plot, xlimits = xlimits,
         gridline_width = gridline_width, fig_size = fig_size,
-        subplt = True, sp_idx = [nrows,ncols,subplt_idx])
+        axarr = axarr, sp_idx = subplt_idx)
 
     # ASD subgrps subplot
-    subplt_idx = 3
-    plot_subgrp_ksdensity(mu_subgrp, sd, n4plot = n4plot, xlimits = xlimits,
-        gridline_width = gridline_width, grp_type = "ASDsubgrps",
-        fig_size = fig_size, subplt = True, sp_idx = [nrows,ncols,subplt_idx])
+    subplt_idx = 2
+    plot_subgrp_ksdensity(mu_subgrp = mu_subgrp, sd = sd, n4plot = n4plot,
+        xlimits = xlimits, gridline_width = gridline_width,
+        grp_type = "ASDsubgrps", fig_size = fig_size, axarr = axarr,
+        sp_idx = subplt_idx)
 
 
 
 # function to plot sample subgrp prevalences as histogram
 def make_sample_subgrp_prevalence_plot(results, sample_size, subplt = False,
     sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
+    fig_size = [12,12],
     legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"]):
     """
     Plot sample subgrp prevalences as histogram.
     """
+
+    # make figure specific size
+    plt.figure(figsize = fig_size)
 
     # key for retrieving data from results dictionary
     key = "n%d_subgrp_prevalence" % sample_size
@@ -499,9 +518,6 @@ def make_sample_subgrp_prevalence_plot(results, sample_size, subplt = False,
     # add x and y-axis labels
     plt.xlabel("Sample Prevalence")
     plt.ylabel("Count")
-
-    # show figure
-    plt.show()
 
 
 
@@ -542,7 +558,7 @@ if __name__ == '__main__':
     # make ksdensity plots
     make_ksdensity_subplots(grand_mu = asd_data_stacked.mean(),
         grand_sd = asd_data_stacked.std(), mu_subgrp = mu_subgrp, sd = sd,
-        n4plot = 1000, xlimits = [-5,5], gridline_width = 0.5, fig_size = [12,12],
+        n4plot = 10000, xlimits = [-5,5], gridline_width = 0.5, fig_size = [12,12],
         nrows = 3, ncols = 1)
     # save figure
     if opts.ksd2save  is not None:
