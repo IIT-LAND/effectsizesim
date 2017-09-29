@@ -488,7 +488,7 @@ def make_ksdensity_subplots(grand_mu, grand_sd, mu_subgrp, sd, n4plot = 10000,
 
 
 # function to plot sample subgrp prevalences as histogram
-def make_sample_subgrp_prevalence_plot(results, sample_size, subplt = False,
+def make_sample_subgrp_prevalence_plot(results, sample_size, axarr = None,
     sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
     fig_size = [12,12],
     legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"]):
@@ -496,32 +496,79 @@ def make_sample_subgrp_prevalence_plot(results, sample_size, subplt = False,
     Plot sample subgrp prevalences as histogram.
     """
 
-    # make figure specific size
-    plt.figure(figsize = fig_size)
-
     # key for retrieving data from results dictionary
     key = "n%d_subgrp_prevalence" % sample_size
 
-    if not subplt:
+    if axarr is None:
+        # make figure specific size
+        plt.figure(figsize = fig_size)
         plt.hist(results[key], bins = nbins)
+
+        # add legend
+        plt.legend(legend_labels)
+
+        # add grid lines
+        plt.grid(linewidth = gridline_width)
+
+        # set x-axis limits
+        plt.xlim(xlimits)
+
+        # add x and y-axis labels
+        plt.xlabel("Sample Prevalence")
+        plt.ylabel("Count")
+
     else:
-        plt.subplot(sp_idx[0],sp_idx[1],sp_idx[2]).hist(results[key],
-            bins = nbins)
+        x = sp_idx[0]
+        y = sp_idx[1]
+        
+        data2plot = results[key]
+        axarr[x, y].hist(data2plot, bins = nbins)
 
-    # add legend
-    plt.legend(legend_labels)
+        # insert subplot title
+        title_str = "n = %s" % (str(sample_size))
+        axarr[x, y].set_title(title_str)
 
-    # add grid lines
-    plt.grid(linewidth = gridline_width)
+        # add legend
+        axarr[x, y].legend(legend_labels)
 
-    # set x-axis limits
-    plt.xlim(xlimits)
+        # add grid lines
+        axarr[x, y].grid(linewidth = gridline_width)
 
-    # add x and y-axis labels
-    plt.xlabel("Sample Prevalence")
-    plt.ylabel("Count")
+        # set x-axis limits
+        axarr[x, y].set_xlim(xlimits)
+
+        # add x and y-axis labels
+        axarr[x, y].set_xlabel("Sample Prevalence")
+        axarr[x, y].set_ylabel("Count")
+
+    # set tight layout to eliminate overlap of subplots
+    plt.tight_layout()
 
 
+
+def make_all_sample_prevalence_subplots(results, sample_sizes,
+    gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
+    fig_size = [12,12], nrows = 3, ncols = 2,
+    legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"]):
+
+    # Four axes, returned as a 2-d array
+    f, axarr = plt.subplots(nrows, ncols)
+    f.set_size_inches(fig_size[0],fig_size[1])
+
+    sp_mat = np.arange(len(sample_sizes)).reshape([nrows,ncols])
+
+    # loop over rows and columns in subplot
+    for irow in range(0,nrows):
+        for icol in range(0,ncols):
+
+            # grab input for making specific subplot
+            ss_idx = sp_mat[irow,icol]
+            sample_size = sample_sizes[ss_idx]
+            sp_idx = [irow,icol]
+            make_sample_subgrp_prevalence_plot(results = results,
+                sample_size = sample_size, axarr = axarr, sp_idx = sp_idx,
+                gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
+                legend_labels = legend_labels)
 
 
 
@@ -586,8 +633,13 @@ if __name__ == '__main__':
     #     results = pickle.load(f)
 
     # make sample prevalence plot
-    make_sample_subgrp_prevalence_plot(results, sample_size = 20, subplt = False,
-        sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
+    # make_sample_subgrp_prevalence_plot(results, sample_size = 20, subplt = False,
+    #     sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
+    #     legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"])
+
+    make_all_sample_prevalence_subplots(results = results,
+        sample_sizes = sample_sizes, gridline_width = 0.5, nbins = 20,
+        xlimits = [-0.05, 0.6], fig_size = [12,12], nrows = 3, ncols = 2,
         legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"])
     # save figure
     if opts.pdf2save is not None:
