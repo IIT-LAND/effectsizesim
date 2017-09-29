@@ -466,34 +466,35 @@ if __name__ == '__main__':
         sample_sizes = sample_sizes, pop_size = 10000000, n_exp = 10000)
 
     # make effect size plot
-    n_subplot_rows = 3
-    n_subplot_cols = 2
-    make_effectsize_subplots(nrows = n_subplot_rows, ncols = n_subplot_cols,
-        effect_size = d, mask = h0, popES = D, ci = ci,
-        sample_sizes = sample_sizes, nbins = 100, gridline_width = 0.5,
-        xlimits = [-1, 2])
-
-    # save effect size plot as pdf
     if opts.espdf2save is not None:
+        n_subplot_rows = 3
+        n_subplot_cols = 2
+        make_effectsize_subplots(nrows = n_subplot_rows, ncols = n_subplot_cols,
+            effect_size = d, mask = h0, popES = D, ci = ci,
+            sample_sizes = sample_sizes, nbins = 100, gridline_width = 0.5,
+            xlimits = [-1, 2])
+
+        # save effect size plot as pdf
         plt.savefig(opts.espdf2save)
 
     # compute effect size inflation stats
-    es_inflation_stats = compute_inflation_stats(effect_size = d, h0 = h0,
-        sample_sizes = sample_sizes, popES = D, ci_interval = [0.5, 99.5])
-    print(es_inflation_stats)
-
-    # write effect size inflation stats to csv file
     if opts.csv2save is not None:
+        es_inflation_stats = compute_inflation_stats(effect_size = d, h0 = h0,
+            sample_sizes = sample_sizes, popES = D, ci_interval = [0.5, 99.5])
+        print(es_inflation_stats)
+
+        # write effect size inflation stats to csv file
         es_inflation_stats.to_csv(opts.csv2save, index = False)
 
-    # run simulation over a range of effect sizes
-    es_range = np.linspace(0,2,21)
-    es_inf_res = effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
-        sample_sizes)
 
-    # plot effect size inflation over a range of effect sizes and sample sizes
-    plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
-        fig_size = (10,8))
-    # save plot as pdf
     if opts.esinfpdf2save is not None:
+        # run simulation over a range of effect sizes
+        es_range = np.linspace(0,2,21)
+        es_inf_res = effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
+            sample_sizes)
+
+        # plot effect size inflation over a range of effect sizes and sample sizes
+        plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
+            fig_size = (10,8))
+        # save plot as pdf
         plt.savefig(opts.esinfpdf2save)
