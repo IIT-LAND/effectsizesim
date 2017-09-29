@@ -12,7 +12,6 @@ python effect_size_simulation.py --es 0.5 --espdf2save es_subplot.pdf
 """
 
 # import libraries
-import sys
 import numpy as np
 import scipy.stats as stats
 import matplotlib.pyplot as plt
