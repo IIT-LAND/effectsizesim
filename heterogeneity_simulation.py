@@ -34,6 +34,7 @@ def parse_args():
     parser.add_option('--n_exp',"",dest='n_exp',help="Number of experiments to simulation ex: --n_exp 10000",default=10000)
     parser.add_option('--n_subgrp',"",dest='n_subgrp',help="Number of ASD subgroups to simulation ex: --n_subgrp 5",default=5)
     parser.add_option('--subgrp_pop_n',"",dest='subgrp_pop_n',help="Size of each subgroup in the population ex: --subgrp_pop_n 200000",default=200000)
+    parser.add_option('--ksd2save',"",dest='ksd2save',help="PDF filename of ksdensity plot figure to save ex: --ksd2save ksd_plot.pdf",default=None)
     parser.add_option('--pdf2save',"",dest='pdf2save',help="PDF filename of figure to save ex: --pdf2save plot.pdf",default=None)
     (options,args) = parser.parse_args()
     return(options)
@@ -535,10 +536,13 @@ if __name__ == '__main__':
         asd_data_stacked.std(), pop_n)
 
     # make ksdensity plots
-    # make_ksdensity_subplots(grand_mu = asd_data_stacked.mean(),
-    #     grand_sd = asd_data_stacked.std(), mu_subgrp = mu_subgrp, sd = sd,
-    #     n4plot = 10000, xlimits = [-5,5], gridline_width = 0.5, fig_size = [12,12],
-    #     nrows = 3, ncols = 1)
+    make_ksdensity_subplots(grand_mu = asd_data_stacked.mean(),
+        grand_sd = asd_data_stacked.std(), mu_subgrp = mu_subgrp, sd = sd,
+        n4plot = 10000, xlimits = [-5,5], gridline_width = 0.5, fig_size = [12,12],
+        nrows = 3, ncols = 1)
+    # save figure
+    if opts.ksd2save  is not None:
+        plt.savefig(opts.ksd2save)
 
     # run main simulation over range of sample sizes
     # n_exp = 10000
