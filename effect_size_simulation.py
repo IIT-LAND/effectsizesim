@@ -434,11 +434,31 @@ def plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
     plt.suptitle("Average Effect Size Inflation")
 
 
+
+
+# function to parse input arguments
+def parse_args():
+    """
+    Parse arguments.
+    """
+    parser=OptionParser()
+    parser.add_option('--es',"",dest='es',help="Population effect size to use ex: --es 0.5",default=0.5)
+    parser.add_option('--espdf2save',"",dest='es_pdf2save',help="PDF filename for effect size figure ex: --espdf2save plot.pdf",default=None)
+    parser.add_option('--csv2save',"",dest='csv2save',help="csv file to save results of simulation over range of effect sizes ex: --csv2save res.csv",default=None)
+    parser.add_option('--esinfpdf2save',"",dest='esinfpdf2save',help="PDF filename for effect size inflation figure ex: --esinfpdf2save es_inf.pdf",default=None)
+    (options,args) = parser.parse_args()
+    return(options)
+
+
+
 # boilerplate code to call main code for executing
 if __name__ == '__main__':
 
+    # parse arguments
+    opts = parse_args()
+
     # run simulation
-    pop_mean1 = np.array(sys.argv[1],dtype=float)
+    pop_mean1 = np.array(opts.es, dtype=float)
     pop_sd1 = 1
     pop_mean2 = 0
     pop_sd2 = 1
@@ -456,9 +476,8 @@ if __name__ == '__main__':
         xlimits = [-1, 2])
 
     # save effect size plot as pdf
-    if len(sys.argv) > 2:
-        pdf2save = sys.argv[2]
-        plt.savefig(pdf2save)
+    if opts.espdf2save is not None:
+        plt.savefig(opts.espdf2save)
 
     # compute effect size inflation stats
     es_inflation_stats = compute_inflation_stats(effect_size = d, h0 = h0,
@@ -466,12 +485,11 @@ if __name__ == '__main__':
     print(es_inflation_stats)
 
     # write effect size inflation stats to csv file
-    if len(sys.argv) > 3:
-        csv2save = sys.argv[3]
-        es_inflation_stats.to_csv(csv2save, index = False)
+    if opts.csv2save is not None:
+        es_inflation_stats.to_csv(opts.csv2save, index = False)
 
     # run simulation over a range of effect sizes
-    es_range = np.arange(0,2.1,0.1)
+    es_range = np.linspace(0,2,21)
     es_inf_res = effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
         sample_sizes)
 
@@ -479,6 +497,5 @@ if __name__ == '__main__':
     plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
         fig_size = (10,8))
     # save plot as pdf
-    if len(sys.argv) > 4:
-        pdf2save = sys.argv[4]
-        plt.savefig(pdf2save)
+    if opts.esinfpdf2save is not None:
+        plt.savefig(opts.esinfpdf2save)
