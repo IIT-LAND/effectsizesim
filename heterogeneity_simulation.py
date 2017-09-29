@@ -33,6 +33,8 @@ def parse_args():
     parser=OptionParser()
     parser.add_option('--n_exp',"",dest='n_exp',help="Number of experiments to simulation ex: --n_exp 10000",default=10000)
     parser.add_option('--n_subgrp',"",dest='n_subgrp',help="Number of ASD subgroups to simulation ex: --n_subgrp 5",default=5)
+    parser.add_option('--mu_subgrp',"",dest='mu_subgrp',help="Effect size for each subgroup ex: --mu_subgrp '-1,-0.5,0,0.5,1'",default='-1,-0.5,0,0.5,1')
+    parser.add_option('--pop_sd',"",dest='pop_sd',help="Population standard deviation ex: --pop_sd 1",default=1)
     parser.add_option('--subgrp_pop_n',"",dest='subgrp_pop_n',help="Size of each subgroup in the population ex: --subgrp_pop_n 200000",default=200000)
     parser.add_option('--ksd2save',"",dest='ksd2save',help="PDF filename of ksdensity plot figure to save ex: --ksd2save ksd_plot.pdf",default=None)
     parser.add_option('--pdf2save',"",dest='pdf2save',help="PDF filename of figure to save ex: --pdf2save plot.pdf",default=None)
@@ -538,14 +540,17 @@ if __name__ == '__main__':
     # sample size of each subgroup
     subgrp_pop_n = np.array(opts.subgrp_pop_n, dtype = int)
 
+    # mean for ASD subgrps from -1 to 1 in intervals of 0.5
+    # mu_subgrp = np.linspace(-1,1,n_subgrp)
+    mu_subgrp = opts.mu_subgrp
+    mu_subgrp = np.array(mu_subgrp.split(','),dtype = float)
+
+    # population SD
+    sd = np.array(opts.pop_sd, dtype = int)
+
     # total population n
     pop_n = n_subgrp*subgrp_pop_n
 
-    # mean for ASD subgrps from -1 to 1 in intervals of 0.5
-    mu_subgrp = np.linspace(-1,1,n_subgrp)
-
-    # population SD
-    sd = 1
 
     # generate ASD data
     [asd_data, asd_data_stacked] = generate_asd_data(mu_subgrp, sd,
