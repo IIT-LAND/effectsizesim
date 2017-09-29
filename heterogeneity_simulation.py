@@ -5,6 +5,9 @@ prevalence in the population. Both ASD and TD populations will be set to the
 same mean and sd, so there will be no overall case-control difference. We
 then simulate experiments with different sample sizes, and compute what is
 the sample prevalence for the 5 ASD subtypes.
+
+Example usage:
+python heterogeneity_simulation.py --n_exp 10000 --n_subgrp 5 --subgrp_pop_n 200000 --pdf2save sample_prevalence_plot.pdf
 """
 
 # import libraries
@@ -15,9 +18,26 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import random
 import pickle
+from optparse import OptionParser
 
 # set seed for reproducibility
 np.random.seed(1)
+
+
+
+# function to parse input arguments
+def parse_args():
+    """
+    Parse arguments.
+    """
+    parser=OptionParser()
+    parser.add_option('--n_exp',"",dest='n_exp',help="Number of experiments to simulation ex: --n_exp 10000",default=10000)
+    parser.add_option('--n_subgrp',"",dest='n_subgrp',help="Number of ASD subgroups to simulation ex: --n_subgrp 5",default=5)
+    parser.add_option('--subgrp_pop_n',"",dest='subgrp_pop_n',help="Size of each subgroup in the population ex: --subgrp_pop_n 200000",default=200000)
+    parser.add_option('--pdf2save',"",dest='pdf2save',help="PDF filename of figure to save ex: --pdf2save plot.pdf",default=None)
+    (options,args) = parser.parse_args()
+    return(options)
+
 
 
 
@@ -485,11 +505,17 @@ def make_sample_subgrp_prevalence_plot(results, sample_size, subplt = False,
 # boilerplate code to call main code for executing
 if __name__ == '__main__':
 
+    # parse arguments
+    opts = parse_args()
+
+    # n experiments to simulate
+    n_exp = opts.n_exp
+
     # n subgrps
-    n_subgrp = 5
+    n_subgrp = opts.n_subgrp
 
     # sample size of each subgroup
-    subgrp_pop_n = 200000
+    subgrp_pop_n = opts.subgrp_pop_n
 
     # total population n
     pop_n = n_subgrp*subgrp_pop_n
@@ -515,22 +541,25 @@ if __name__ == '__main__':
     #     nrows = 3, ncols = 1)
 
     # run main simulation over range of sample sizes
-    n_exp = 10000
+    # n_exp = 10000
     sample_sizes = [20, 50, 100, 200, 1000, 2000]
     results = run_simulation_over_sample_sizes(pop1_data_stacked = asd_data_stacked,
         pop2_data = nonasd_data, n_exp = n_exp, sample_sizes = sample_sizes,
         pop1_data = asd_data)
 
-    # Saving the objects:
-    fname2save = "/Users/mvlombardo/Dropbox/Jupyter/objs.pickle"
-    with open(fname2save, 'w') as f:  # Python 3: open(..., 'wb')
-        pickle.dump([results], f)
+    # # Saving the objects:
+    # fname2save = "/Users/mvlombardo/Dropbox/Jupyter/objs.pickle"
+    # with open(fname2save, 'w') as f:  # Python 3: open(..., 'wb')
+    #     pickle.dump([results], f)
 
     # # Getting back the objects:
     # with open(fname2save) as f:  # Python 3: open(..., 'rb')
     #     results = pickle.load(f)
 
-
-    # make_sample_subgrp_prevalence_plot(results, sample_size = 20, subplt = False,
-    #     sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
-    #     legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"])
+    # make sample prevalence plot
+    make_sample_subgrp_prevalence_plot(results, sample_size = 20, subplt = False,
+        sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
+        legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"])
+    # save figure
+    if opts.pdf2save is not None:
+        plt.savefig(opts.pdf2save)
