@@ -493,7 +493,7 @@ def make_sample_subgrp_prevalence_plot(results, sample_size, subplt = False,
     plt.grid(linewidth = gridline_width)
 
     # set x-axis limits
-    plt.set_xlim(xlimits)
+    plt.xlim(xlimits)
 
     # add x and y-axis labels
     plt.xlabel("Sample Prevalence")
