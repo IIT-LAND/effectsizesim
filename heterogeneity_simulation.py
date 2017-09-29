@@ -7,7 +7,7 @@ then simulate experiments with different sample sizes, and compute what is
 the sample prevalence for the 5 ASD subtypes.
 
 Example usage:
-python heterogeneity_simulation.py --n_exp 10000 --n_subgrp 5 --subgrp_pop_n 200000 --pdf2save sample_prevalence_plot.pdf
+python heterogeneity_simulation.py --n_exp 10000 --n_subgrp 5 --mu_subgrp '-1,-0.5,0,0.5,1' --pop_sd 1 --subgrp_pop_n 200000 --kds2save kdsplot.pdf --pdf2save sample_prevalence_plot.pdf
 """
 
 # import libraries
@@ -520,7 +520,7 @@ def make_sample_subgrp_prevalence_plot(results, sample_size, axarr = None,
     else:
         x = sp_idx[0]
         y = sp_idx[1]
-        
+
         data2plot = results[key]
         axarr[x, y].hist(data2plot, bins = nbins)
 
