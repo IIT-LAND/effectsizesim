@@ -111,7 +111,7 @@ def randomly_select_sample(pop_data, sample_size):
     sample_idx = rand_idx[range(sample_size)]
 
     # sample data
-    sample_data  = pop_data[idx2use]
+    sample_data  = pop_data[sample_idx]
 
     return([sample_data, sample_idx])
 
