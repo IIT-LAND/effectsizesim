@@ -360,6 +360,8 @@ def run_main_simulation(pop_mean1, pop_sd1, pop_mean2, pop_sd2, sample_sizes,
         # loop over different sample sizes
         for ss_index, sample_size in enumerate(sample_sizes):
 
+            print("Running experiment #%d at n=%d" % (iexp, sample_size))
+
             # simulate random samples from population
             [samp1_data, samp2_data] = simulate_experiment(pop1_data,pop2_data,sample_size)
             # grab statistics to evaluate results of experiment
