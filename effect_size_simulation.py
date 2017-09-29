@@ -7,7 +7,7 @@ plot of effect sizes as pdf and can produce a csv file with statistics about the
 degree of effect size inflation.
 
 Example usage:
-python effect_size_simulation.py --es 0.5 --espdf2save es_subplot.pdf
+python effect_size_simulation.py --es 0.5 --n_exp 10000 --espdf2save es_subplot.pdf
     --csv2save test.csv --esinfpdf2save es_inf_plot.pdf
 """
 
@@ -17,6 +17,7 @@ import scipy.stats as stats
 import matplotlib.pyplot as plt
 import pandas as pd
 from optparse import OptionParser
+import random
 
 
 # set seed for reproducibility
@@ -30,7 +31,8 @@ def parse_args():
     """
     parser=OptionParser()
     parser.add_option('--es',"",dest='es',help="Population effect size to use ex: --es 0.5",default=0.5)
-    parser.add_option('--espdf2save',"",dest='es_pdf2save',help="PDF filename for effect size figure ex: --espdf2save plot.pdf",default=None)
+    parser.add_option('--n_exp',"",dest='n_exp',help="Number of experiments to simulat ex: --n_exp 10000",default=10000)
+    parser.add_option('--espdf2save',"",dest='espdf2save',help="PDF filename for effect size figure ex: --espdf2save plot.pdf",default=None)
     parser.add_option('--csv2save',"",dest='csv2save',help="csv file to save results of simulation over range of effect sizes ex: --csv2save res.csv",default=None)
     parser.add_option('--esinfpdf2save',"",dest='esinfpdf2save',help="PDF filename for effect size inflation figure ex: --esinfpdf2save es_inf.pdf",default=None)
     (options,args) = parser.parse_args()
@@ -100,20 +102,24 @@ def randomly_select_sample(pop_data, sample_size):
     """
     Randomly sample data from population without replacement.
     """
+    # # make indices 1:len(pop_data)
+    # idx = range(len(pop_data))
+    #
+    # # randomly permute indices
+    # rand_idx = np.random.permutation(idx)
+    #
+    # # grab the first n randomly permuted indices
+    # sample_idx = rand_idx[range(sample_size)]
+    #
+    # # sample data
+    # sample_data  = pop_data[sample_idx]
 
-    # make indices 1:len(pop_data)
-    idx = range(len(pop_data))
+    sample_data = np.array(random.sample(pop_data, sample_size))
+    # sample_data = np.random.choice(pop_data, sample_size, replace = False)
 
-    # randomly permute indices
-    rand_idx = np.random.permutation(idx)
-
-    # grab the first n randomly permuted indices
-    sample_idx = rand_idx[range(sample_size)]
-
-    # sample data
-    sample_data  = pop_data[sample_idx]
-
-    return([sample_data, sample_idx])
+    # print(type(sample_data))
+    # return([sample_data, sample_idx])
+    return(sample_data)
 
 
 # function to evaluate results of experiment
@@ -135,6 +141,7 @@ def evaluate_experiment(samp1_data, samp2_data, alpha_thresh = 0.05):
     p = hp_res.pvalue
 
     # grab indicator of whether H0 is rejected
+    alpha_thresh = np.array(alpha_thresh, dtype = float)
     reject_h0 = p < alpha_thresh
 
     return((d, t, p, reject_h0))
@@ -147,10 +154,12 @@ def simulate_experiment(pop1_data,pop2_data,sample_size):
     """
 
     # randomly sample group1
-    [samp1_data, samp1_idx] = randomly_select_sample(pop1_data, sample_size)
+    # [samp1_data, samp1_idx] = randomly_select_sample(pop1_data, sample_size)
+    samp1_data = randomly_select_sample(pop1_data, sample_size)
 
     # randomly sample group2
-    [samp2_data, samp1_idx] = randomly_select_sample(pop2_data, sample_size)
+    # [samp2_data, samp2_idx] = randomly_select_sample(pop2_data, sample_size)
+    samp2_data = randomly_select_sample(pop2_data, sample_size)
 
     return((samp1_data, samp2_data))
 
@@ -355,7 +364,7 @@ def run_main_simulation(pop_mean1, pop_sd1, pop_mean2, pop_sd2, sample_sizes,
     h0 = np.zeros([n_exp,len(sample_sizes)])
 
     # Simulate n experiments
-    for iexp in range(0,n_exp):
+    for iexp in np.arange(n_exp):
 
         # loop over different sample sizes
         for ss_index, sample_size in enumerate(sample_sizes):
@@ -459,13 +468,14 @@ if __name__ == '__main__':
 
     # run simulation
     pop_mean1 = np.array(opts.es, dtype=float)
-    pop_sd1 = 1
-    pop_mean2 = 0
-    pop_sd2 = 1
+    pop_sd1 = np.array(1, dtype = float)
+    pop_mean2 = np.array(0, dtype = float)
+    pop_sd2 = np.array(1, dtype = float)
     sample_sizes = [20, 50, 100, 200, 1000, 2000]
+    n_exp = np.array(opts.n_exp, dtype = int)
     [d, t, p, h0, D, ci] = run_main_simulation(pop_mean1 = pop_mean1,
         pop_sd1 = pop_sd1, pop_mean2 = pop_mean2, pop_sd2 = pop_sd2,
-        sample_sizes = sample_sizes, pop_size = 10000000, n_exp = 10000)
+        sample_sizes = sample_sizes, pop_size = 10000000, n_exp = n_exp)
 
     # make effect size plot
     if opts.espdf2save is not None:
