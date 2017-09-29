@@ -384,7 +384,7 @@ def plot_subgrp_ksdensity(mu_subgrp, sd, n4plot = 10000,
     plt.ylabel("Count")
 
     # show plot
-    # plt.show()
+    plt.show()
 
 
 
@@ -432,7 +432,7 @@ def plot_pop_ksdensity(grp, mu, sd, n4plot = 10000, xlimits = [-6,6],
     plt.ylabel("Count")
 
     # show plot
-    # plt.show()
+    plt.show()
 
 
 
@@ -469,6 +469,7 @@ def make_ksdensity_subplots(grand_mu, grand_sd, mu_subgrp, sd, n4plot = 10000,
         fig_size = fig_size, subplt = True, sp_idx = [nrows,ncols,subplt_idx])
 
 
+
 # function to plot sample subgrp prevalences as histogram
 def make_sample_subgrp_prevalence_plot(results, sample_size, subplt = False,
     sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
@@ -498,6 +499,9 @@ def make_sample_subgrp_prevalence_plot(results, sample_size, subplt = False,
     # add x and y-axis labels
     plt.xlabel("Sample Prevalence")
     plt.ylabel("Count")
+
+    # show figure
+    plt.show()
 
 
 
