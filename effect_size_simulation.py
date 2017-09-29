@@ -434,12 +434,15 @@ def plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
     ss_legend = []
     for ss in sample_sizes:
         ss_legend.append("n = %d" % ss)
-    plt.legend(ss_legend, fontname = font_name)
+    plt.legend(ss_legend)
 
     # add x and y-axis labels
     plt.ylabel("Average Effect Size Inflation (Percent Increase)",
         fontname = font_name)
     plt.xlabel("Population Effect Size", fontname = font_name)
+
+    # tight layout
+    plt.tight_layout()
 
     # add plot title
     plt.title("Average Effect Size Inflation", fontname = font_name,
