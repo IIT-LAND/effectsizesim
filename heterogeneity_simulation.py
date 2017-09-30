@@ -346,7 +346,7 @@ def generate_data_for_ksdensity_plot(grp_type, mu, sd, n4plot = 10000):
 # function for making kernel density plot
 def plot_subgrp_ksdensity(mu_subgrp, sd, n4plot = 10000,
     xlimits = [-6,6], gridline_width = 0.5, fig_size = [12,12],
-    grp_type = "ASDsubgrps", axarr=None, sp_idx = None):
+    grp_type = "ASDsubgrps", axarr=None, sp_idx = None, font_name = "Arial"):
     """
     Make kernel density plots for each ASD subgrp.
     """
@@ -377,8 +377,8 @@ def plot_subgrp_ksdensity(mu_subgrp, sd, n4plot = 10000,
             plt.legend()
 
             # add x and y-axis labels
-            plt.xlabel("DV")
-            plt.ylabel("Count")
+            plt.xlabel("DV", fontname = font_name)
+            plt.ylabel("Density", fontname = font_name)
 
         else:
             axarr[sp_idx].plot(xs, density(xs), label = label2use)
@@ -390,14 +390,15 @@ def plot_subgrp_ksdensity(mu_subgrp, sd, n4plot = 10000,
             axarr[sp_idx].legend()
 
             # add x and y-axis labels
-            axarr[sp_idx].set_xlabel("DV")
-            axarr[sp_idx].set_ylabel("Count")
+            axarr[sp_idx].set_xlabel("DV", fontname = font_name)
+            axarr[sp_idx].set_ylabel("Density", fontname = font_name)
 
 
 
 # function for making kernel density plot
 def plot_pop_ksdensity(grp, mu, sd, n4plot = 10000, xlimits = [-6,6],
-    gridline_width = 0.5, fig_size = [12,12], axarr = None, sp_idx = None):
+    gridline_width = 0.5, fig_size = [12,12], axarr = None, sp_idx = None,
+    font_name = "Arial"):
     """
     Make kernel density plots for each population.
     """
@@ -430,8 +431,8 @@ def plot_pop_ksdensity(grp, mu, sd, n4plot = 10000, xlimits = [-6,6],
         plt.legend()
 
         # add x and y-axis labels
-        plt.xlabel("DV")
-        plt.ylabel("Count")
+        plt.xlabel("DV", fontname = font_name)
+        plt.ylabel("Density", fontname = font_name)
 
     else:
         axarr[sp_idx].plot(xs,density(xs), label = grp)
@@ -443,8 +444,8 @@ def plot_pop_ksdensity(grp, mu, sd, n4plot = 10000, xlimits = [-6,6],
         axarr[sp_idx].legend()
 
         # add x and y-axis labels
-        axarr[sp_idx].set_xlabel("DV")
-        axarr[sp_idx].set_ylabel("Count")
+        axarr[sp_idx].set_xlabel("DV", fontname = font_name)
+        axarr[sp_idx].set_ylabel("Density", fontname = font_name)
 
 
 
@@ -490,7 +491,7 @@ def make_ksdensity_subplots(grand_mu, grand_sd, mu_subgrp, sd, n4plot = 10000,
 # function to plot sample subgrp prevalences as histogram
 def make_sample_subgrp_prevalence_plot(results, sample_size, axarr = None,
     sp_idx = None, gridline_width = 0.5, nbins = 20, xlimits = [-0.05, 0.6],
-    fig_size = [12,12],
+    fig_size = [12,12], font_name = "Arial",
     legend_labels = ["ASD1","ASD2","ASD3", "ASD4","ASD5"]):
     """
     Plot sample subgrp prevalences as histogram.
@@ -514,8 +515,8 @@ def make_sample_subgrp_prevalence_plot(results, sample_size, axarr = None,
         plt.xlim(xlimits)
 
         # add x and y-axis labels
-        plt.xlabel("Sample Prevalence")
-        plt.ylabel("Count")
+        plt.xlabel("Sample Prevalence", fontname = font_name)
+        plt.ylabel("Count", fontname = font_name)
 
     else:
         x = sp_idx[0]
@@ -526,7 +527,8 @@ def make_sample_subgrp_prevalence_plot(results, sample_size, axarr = None,
 
         # insert subplot title
         title_str = "n = %s" % (str(sample_size))
-        axarr[x, y].set_title(title_str)
+        axarr[x, y].set_title(title_str, fontname = font_name,
+            fontweight = "bold")
 
         # add legend
         axarr[x, y].legend(legend_labels)
@@ -538,8 +540,8 @@ def make_sample_subgrp_prevalence_plot(results, sample_size, axarr = None,
         axarr[x, y].set_xlim(xlimits)
 
         # add x and y-axis labels
-        axarr[x, y].set_xlabel("Sample Prevalence")
-        axarr[x, y].set_ylabel("Count")
+        axarr[x, y].set_xlabel("Sample Prevalence", fontname = font_name)
+        axarr[x, y].set_ylabel("Count", fontname = font_name)
 
     # set tight layout to eliminate overlap of subplots
     plt.tight_layout()
