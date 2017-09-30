@@ -7,8 +7,9 @@ plot of effect sizes as pdf and can produce a csv file with statistics about the
 degree of effect size inflation.
 
 Example usage:
-python effect_size_simulation.py --es 0.5 --n_exp 10000 --espdf2save es_subplot.pdf
-    --csv2save test.csv --esinfpdf2save es_inf_plot.pdf
+python effect_size_simulation.py --es 0.5 --n_exp 10000 --espdf2save es_subplot.pdf --csv2save test.csv
+
+python effect_size_simulation.py --n_exp 10000 --esinfpdf2save es_inf_plot.pdf
 """
 
 # import libraries
@@ -383,7 +384,7 @@ def run_main_simulation(pop_mean1, pop_sd1, pop_mean2, pop_sd2, sample_sizes,
 
 # function to run simulation over range of effect sizes
 def effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
-    sample_sizes):
+    sample_sizes, n_exp = 10000, pop_size = 10000000):
     """
     Run simulation over a range of effect sizes and sample sizes
     """
@@ -397,7 +398,7 @@ def effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
         # run main simulation
         [d, t, p, h0, D, ci] = run_main_simulation(pop_mean1 = es,
             pop_sd1 = pop_sd1, pop_mean2 = pop_mean2, pop_sd2 = pop_sd2,
-            sample_sizes = sample_sizes, pop_size = 10000000, n_exp = 10000)
+            sample_sizes = sample_sizes, pop_size = pop_size, n_exp = n_exp)
 
         # calcular effect size inflation stats
         es_inflation_stats = compute_inflation_stats(effect_size = d, h0 = h0,
@@ -412,7 +413,7 @@ def effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
 
 # function to plot effect size inflation over range of effect sizes
 def plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
-    fig_size = (10,8), font_name = "Arial"):
+    fig_size = (12,12), font_name = "Arial", font_size = 18):
     """
     Plot average effect size inflation over range of effect sizes and sample
     sizes.
@@ -438,15 +439,16 @@ def plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
 
     # add x and y-axis labels
     plt.ylabel("Average Effect Size Inflation (Percent Increase)",
-        fontname = font_name)
-    plt.xlabel("Population Effect Size", fontname = font_name)
+        fontname = font_name, fontsize = font_size)
+    plt.xlabel("Population Effect Size", fontname = font_name,
+        fontsize = font_size)
 
     # tight layout
     plt.tight_layout()
 
     # add plot title
     plt.title("Average Effect Size Inflation", fontname = font_name,
-        fontweight='bold')
+        fontweight='bold', fontsize = font_size)
 
 
 
@@ -465,11 +467,12 @@ if __name__ == '__main__':
     pop_sd1 = np.array(1, dtype = float)
     pop_mean2 = np.array(0, dtype = float)
     pop_sd2 = np.array(1, dtype = float)
-    sample_sizes = [20, 50, 100, 200, 1000, 2000]
     n_exp = np.array(opts.n_exp, dtype = int)
+    sample_sizes = [20, 50, 100, 200, 1000, 2000]
+    pop_size = 10000000
     [d, t, p, h0, D, ci] = run_main_simulation(pop_mean1 = pop_mean1,
         pop_sd1 = pop_sd1, pop_mean2 = pop_mean2, pop_sd2 = pop_sd2,
-        sample_sizes = sample_sizes, pop_size = 10000000, n_exp = n_exp)
+        sample_sizes = sample_sizes, pop_size = pop_size, n_exp = n_exp)
 
     # make effect size plot
     if opts.espdf2save is not None:
@@ -496,8 +499,9 @@ if __name__ == '__main__':
     if opts.esinfpdf2save is not None:
         # run simulation over a range of effect sizes
         es_range = np.linspace(0,2,21)
-        es_inf_res = effect_size_inflation_sim(es_range, pop_sd1, pop_mean2, pop_sd2,
-            sample_sizes)
+        es_inf_res = effect_size_inflation_sim(es_range = es_range,
+            pop_sd1 = pop_sd1, pop_mean2 = pop_mean2, pop_sd2 = pop_sd2,
+            sample_sizes =  sample_sizes, n_exp = n_exp, pop_size = pop_size)
 
         # plot effect size inflation over a range of effect sizes and sample sizes
         plot_es_inflation(es_inf_res, es_range, sample_sizes, gridline_width = 0.5,
